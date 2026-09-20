@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>人生手账 V4</title>
+    <title>人生手账 V5</title>
     <style>
         :root { 
             --bg: #faf7f2; 
@@ -56,7 +56,7 @@
 
         /* Card / List */
         .card { background: var(--box); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 10px; border-bottom: 2px dashed #eee; padding-bottom: 5px; color: var(--accent); display: flex; justify-content: space-between;}
+        .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 10px; border-bottom: 2px dashed #eee; padding-bottom: 5px; color: var(--accent); display: flex; justify-content: space-between; align-items: center;}
         
         .item-row { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95em; padding-bottom: 8px; border-bottom: 1px solid #f5f5f5;}
         .item-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -83,12 +83,44 @@
         .btn-save { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer;}
         .btn-cancel { background: #eee; color: #666; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer;}
 
-        /* History */
-        .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
-        
         /* Hide content */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        
+        /* Calendar Styles */
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calendar-header button { background: none; border: none; font-size: 1.2em; color: var(--accent); cursor: pointer; font-weight: bold; padding: 5px 10px;}
+        .calendar-title { font-weight: bold; font-size: 1.1em; color: var(--text); cursor: pointer; padding: 5px 10px; border-radius: 6px; }
+        .calendar-title:hover { background: #eee; }
+        
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .calendar-day-header { font-size: 0.8em; color: #999; font-weight: bold; padding-bottom: 5px; border-bottom: 1px solid #eee; margin-bottom: 5px;}
+        .calendar-day { padding: 10px 5px; border-radius: 6px; cursor: pointer; font-size: 0.9em; border: 1px solid transparent;}
+        .calendar-day:hover { background: #f5f5f5; }
+        .calendar-day.today { border: 2px solid var(--accent); font-weight: bold; }
+        .calendar-day.has-data { background: #fdf5f1; color: var(--accent); font-weight: bold; position: relative;}
+        .calendar-day.has-data::after { content: ''; display: block; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; margin: 2px auto 0; }
+        .calendar-day.empty { color: transparent; pointer-events: none; }
+        .calendar-day.selected { background: var(--accent); color: white; }
+        
+        /* Month Selector Grid */
+        .month-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; display: none; margin-top: 15px;}
+        .month-grid.active { display: grid; }
+        .month-item { padding: 15px; background: #eee; border-radius: 8px; cursor: pointer; font-weight: bold; color: var(--text); }
+        .month-item:hover { background: #ddd; }
+        .month-item.current-month { background: var(--accent); color: white; }
+
+        /* Daily Detail View (Below Calendar) */
+        .daily-detail { margin-top: 20px; padding-top: 15px; border-top: 2px dashed #eee; display: none; }
+        .daily-detail.active { display: block; }
+        .detail-date { font-weight: bold; color: var(--accent); margin-bottom: 10px; font-size: 1.1em;}
+        
+        /* Progress Bar */
+        .progress-container { width: 100%; background: #eee; border-radius: 10px; height: 16px; margin: 10px 0; overflow: hidden; position: relative;}
+        .progress-bar { height: 100%; background: var(--green); border-radius: 10px; transition: width 0.3s; }
+        .progress-text { position: absolute; width: 100%; text-align: center; top: 0; left: 0; font-size: 0.75em; line-height: 16px; color: #333; font-weight: bold;}
+        
+        .history-item { margin-bottom: 8px; font-size: 0.9em; padding-left: 10px; border-left: 3px solid var(--accent); }
     </style>
 </head>
 <body>
@@ -138,11 +170,49 @@
         <button class="btn-main" onclick="openRewardModal()">+ 添加新奖励</button>
     </div>
 
-    <!-- Tab 3: History -->
+    <!-- Tab 3: History (Calendar) -->
     <div id="history-tab" class="tab-content">
         <div class="card">
-            <div class="section-title">打卡与金币记录</div>
-            <div id="historyList">暂无记录，努力打卡吧！</div>
+            <div class="calendar-header">
+                <button onclick="changeMonth(-1)">&#10094;</button>
+                <div class="calendar-title" id="calendarTitle" onclick="toggleMonthGrid()">2026年9月 ▼</div>
+                <button onclick="changeMonth(1)">&#10095;</button>
+            </div>
+            
+            <!-- Month Selector Grid -->
+            <div id="monthGrid" class="month-grid">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Calendar Days Grid -->
+            <div id="calendarView">
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">日</div>
+                    <div class="calendar-day-header">一</div>
+                    <div class="calendar-day-header">二</div>
+                    <div class="calendar-day-header">三</div>
+                    <div class="calendar-day-header">四</div>
+                    <div class="calendar-day-header">五</div>
+                    <div class="calendar-day-header">六</div>
+                </div>
+                <div class="calendar-grid" id="calendarDays">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- Daily Detail View -->
+            <div id="dailyDetail" class="daily-detail">
+                <div class="detail-date" id="detailDate"></div>
+                <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">当日结余金币 (距目标 150K RM 还有漫长路程)</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="detailGoldBar" style="width: 0%;"></div>
+                    <div class="progress-text" id="detailGoldText">0 G</div>
+                </div>
+                <div style="font-weight: bold; margin: 15px 0 5px; color: var(--text);">完成记录:</div>
+                <div id="detailLogs">
+                    <!-- Logs go here -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -200,10 +270,23 @@
 
     <script>
         // --- 1. 数据初始化 ---
+        // 为了演示日历功能，我们预设几条假的历史数据（在8月和9月）
+        let mockHistory = {};
+        // 生成 2026-08-31 的记录
+        mockHistory['2026-08-31'] = {
+            gold: 350,
+            logs: ["记账 (+10G)", "敷面膜 (+10G)", "运动打卡 (+50G)"]
+        };
+        // 生成 2026-09-18 的记录
+        mockHistory['2026-09-18'] = {
+            gold: 850,
+            logs: ["备菜/准备便当 (+20G)", "存RM150K节点 (+500G)"]
+        };
+
         let defaultState = {
             hp: 100,
-            gold: 0,
-            lastLoginDate: new Date().toDateString(),
+            gold: 850, // 继承上面的测试数据
+            lastLoginDate: new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD format
             tasks: [
                 { id: Date.now()+1, text: "记账", type: "daily", hpCost: 5, goldReward: 10, done: false },
                 { id: Date.now()+2, text: "敷面膜", type: "daily", hpCost: 5, goldReward: 10, done: false },
@@ -220,21 +303,24 @@
                 { id: Date.now()+12, text: "豪华烤鸡排放纵餐 🍗", cost: 800 },
                 { id: Date.now()+13, text: "买新首饰/安踏装备 🛍️", cost: 3000 }
             ],
-            history: []
+            history: mockHistory // Key: YYYY-MM-DD, Value: { gold: int, logs: [] }
         };
 
-        let state = JSON.parse(localStorage.getItem('lifeRpgState_v4')) || defaultState;
+        let state = JSON.parse(localStorage.getItem('lifeRpgState_v5')) || defaultState;
+        
+        // --- 日历状态 ---
+        let currentDate = new Date(); // 真实当前时间
+        let displayYear = currentDate.getFullYear();
+        let displayMonth = currentDate.getMonth(); // 0-11
+        let selectedDateStr = null;
 
         // --- 2. 跨日刷新逻辑 ---
-        let todayStr = new Date().toDateString();
-        if (state.lastLoginDate !== todayStr) {
-            let doneDailies = state.tasks.filter(t => t.type === 'daily' && t.done).length;
-            state.history.unshift({
-                date: state.lastLoginDate,
-                info: `完成日常: ${doneDailies} 项 | 结余金币: ${state.gold} G`
-            });
-            if(state.history.length > 30) state.history.pop();
+        function getTodayStr() {
+            return new Date().toLocaleDateString('en-CA'); // 返回本地时区的 YYYY-MM-DD
+        }
 
+        let todayStr = getTodayStr();
+        if (state.lastLoginDate !== todayStr) {
             state.hp = 100;
             state.tasks.forEach(t => { 
                 if(t.type === 'daily') t.done = false; 
@@ -243,9 +329,32 @@
             saveData();
         }
 
+        // 修改：每次打勾/取消打勾，都实时更新当日的 history 记录
+        function updateTodayHistory() {
+            let logs = [];
+            state.tasks.forEach(t => {
+                if (t.done) {
+                    let sign = t.goldReward > 0 ? '+' : '';
+                    logs.push(`${t.text} (${sign}${t.goldReward}G)`);
+                }
+            });
+            if (logs.length > 0 || state.gold > 0) {
+                state.history[todayStr] = {
+                    gold: state.gold,
+                    logs: logs
+                };
+            }
+        }
+
         function saveData() {
-            localStorage.setItem('lifeRpgState_v4', JSON.stringify(state));
+            updateTodayHistory(); // 确保最新状态写入字典
+            localStorage.setItem('lifeRpgState_v5', JSON.stringify(state));
             render();
+            // 如果在历史Tab，可能需要刷新日历详情
+            if(document.getElementById('history-tab').classList.contains('active')) {
+                renderCalendar();
+                if(selectedDateStr) showDateDetail(selectedDateStr);
+            }
         }
 
         // --- 3. 渲染 UI ---
@@ -295,22 +404,9 @@
                     </div>
                 `;
             });
-
-            const historyList = document.getElementById('historyList');
-            if (state.history.length > 0) {
-                historyList.innerHTML = '';
-                state.history.forEach(h => {
-                    historyList.innerHTML += `
-                        <div class="history-item">
-                            <span style="color:var(--accent); font-weight:bold;">${h.date.substring(4, 10)}</span>
-                            <span style="color:#888; font-size:0.9em;">${h.info}</span>
-                        </div>
-                    `;
-                });
-            }
         }
 
-        // --- 4. 业务逻辑 (打勾、购买等) ---
+        // --- 4. 业务逻辑 ---
         function toggleTask(id) {
             let task = state.tasks.find(t => t.id === id);
             if (!task.done) {
@@ -447,6 +543,10 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById(`${tabId}-tab`).classList.add('active');
+            
+            if(tabId === 'history') {
+                renderCalendar();
+            }
         }
 
         function updateTime() {
@@ -474,6 +574,126 @@
             }
         }
         fetchWeather();
+
+        // --- 7. 日历逻辑 ---
+        function renderCalendar() {
+            document.getElementById('calendarTitle').innerText = `${displayYear}年${displayMonth + 1}月 ▼`;
+            
+            const daysContainer = document.getElementById('calendarDays');
+            daysContainer.innerHTML = '';
+            
+            let firstDay = new Date(displayYear, displayMonth, 1).getDay();
+            let daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
+            
+            for (let i = 0; i < firstDay; i++) {
+                daysContainer.innerHTML += `<div class="calendar-day empty">0</div>`;
+            }
+            
+            let today = new Date();
+            for (let i = 1; i <= daysInMonth; i++) {
+                let m = (displayMonth + 1).toString().padStart(2, '0');
+                let d = i.toString().padStart(2, '0');
+                let dateStr = `${displayYear}-${m}-${d}`;
+                
+                let classList = "calendar-day";
+                if (displayYear === today.getFullYear() && displayMonth === today.getMonth() && i === today.getDate()) {
+                    classList += " today";
+                }
+                if (state.history[dateStr]) {
+                    classList += " has-data";
+                }
+                if (dateStr === selectedDateStr) {
+                    classList += " selected";
+                }
+                
+                daysContainer.innerHTML += `<div class="${classList}" onclick="selectDate('${dateStr}')">${i}</div>`;
+            }
+        }
+        
+        function changeMonth(delta) {
+            displayMonth += delta;
+            if (displayMonth < 0) {
+                displayMonth = 11;
+                displayYear--;
+            } else if (displayMonth > 11) {
+                displayMonth = 0;
+                displayYear++;
+            }
+            selectedDateStr = null;
+            document.getElementById('dailyDetail').classList.remove('active');
+            document.getElementById('calendarView').style.display = 'block';
+            document.getElementById('monthGrid').classList.remove('active');
+            renderCalendar();
+        }
+
+        function toggleMonthGrid() {
+            const grid = document.getElementById('monthGrid');
+            const view = document.getElementById('calendarView');
+            if (grid.classList.contains('active')) {
+                grid.classList.remove('active');
+                view.style.display = 'block';
+            } else {
+                grid.classList.add('active');
+                view.style.display = 'none';
+                renderMonthGrid();
+            }
+        }
+
+        function renderMonthGrid() {
+            const grid = document.getElementById('monthGrid');
+            grid.innerHTML = '';
+            const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+            
+            months.forEach((m, index) => {
+                let currentClass = (index === displayMonth) ? 'current-month' : '';
+                grid.innerHTML += `<div class="month-item ${currentClass}" onclick="selectMonth(${index})">${m}</div>`;
+            });
+        }
+
+        function selectMonth(mIndex) {
+            displayMonth = mIndex;
+            toggleMonthGrid(); 
+            selectedDateStr = null;
+            document.getElementById('dailyDetail').classList.remove('active');
+            renderCalendar();
+        }
+
+        function selectDate(dateStr) {
+            selectedDateStr = dateStr;
+            renderCalendar(); 
+            showDateDetail(dateStr);
+        }
+
+        function showDateDetail(dateStr) {
+            const detailView = document.getElementById('dailyDetail');
+            detailView.classList.add('active');
+            document.getElementById('detailDate').innerText = `${dateStr} 记录`;
+            
+            const record = state.history[dateStr];
+            const goldText = document.getElementById('detailGoldText');
+            const goldBar = document.getElementById('detailGoldBar');
+            const logsContainer = document.getElementById('detailLogs');
+            
+            if (record) {
+                let gold = record.gold;
+                let visualMax = 5000;
+                let percent = Math.min(100, (gold / visualMax) * 100);
+                
+                goldText.innerText = `${gold} G`;
+                goldBar.style.width = '0%';
+                setTimeout(() => { goldBar.style.width = `${percent}%`; }, 50);
+
+                if (record.logs && record.logs.length > 0) {
+                    logsContainer.innerHTML = record.logs.map(log => `<div class="history-item">${log}</div>`).join('');
+                } else {
+                    logsContainer.innerHTML = '<div style="color:#999; font-size:0.9em; padding-left:10px;">有金币变动，但未记录具体任务。</div>';
+                }
+            } else {
+                goldText.innerText = `0 G`;
+                goldBar.style.width = '0%';
+                logsContainer.innerHTML = '<div style="color:#999; font-size:0.9em; padding-left:10px;">今天没有打卡记录哦。</div>';
+            }
+        }
 
         render();
     </script>

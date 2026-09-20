@@ -3,133 +3,478 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>人生手账</title>
+    <title>人生手账 V4</title>
     <style>
-        :root { --bg: #f9f6f0; --text: #5c4d43; --accent: #e2b49a; --box: #ffffff; }
-        body { font-family: 'PingFang SC', sans-serif; background: var(--bg); color: var(--text); padding: 20px; max-width: 500px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2em; border-bottom: 2px dashed var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
-        .card { background: var(--box); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .task-item { display: flex; align-items: center; margin-bottom: 10px; font-size: 16px; }
-        .task-item input { margin-right: 12px; width: 18px; height: 18px; accent-color: var(--accent); }
-        .task-meta { font-size: 0.8em; color: #999; margin-left: auto; }
-        .shop-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-        button { background: var(--accent); color: #fff; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        button:disabled { background: #ccc; }
-        h3 { margin-top: 0; color: var(--accent); }
+        :root { 
+            --bg: #faf7f2; 
+            --text: #5c4d43; 
+            --accent: #e2b49a; 
+            --accent-hover: #d1a086;
+            --box: #ffffff; 
+            --green: #a8c3a6;
+            --red: #e09f9f;
+        }
+        body { 
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            padding: 15px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            line-height: 1.5;
+        }
+        /* Top Info Bar */
+        .info-bar {
+            background: var(--box);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        .time-row { font-weight: bold; font-size: 1.1em; color: var(--accent); margin-bottom: 5px; }
+        .weather-row { color: #888; font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 8px; }
+        
+        /* Status Bar */
+        .status-bar {
+            display: flex; justify-content: space-between;
+            background: var(--accent); color: white;
+            padding: 12px 20px; border-radius: 12px;
+            font-weight: bold; font-size: 1.1em;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(226, 180, 154, 0.3);
+        }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab { 
+            flex: 1; text-align: center; padding: 10px; 
+            background: #eee; border-radius: 8px; 
+            cursor: pointer; font-weight: bold; color: #888;
+        }
+        .tab.active { background: var(--box); color: var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        /* Card / List */
+        .card { background: var(--box); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 10px; border-bottom: 2px dashed #eee; padding-bottom: 5px; color: var(--accent); display: flex; justify-content: space-between;}
+        
+        .item-row { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95em; padding-bottom: 8px; border-bottom: 1px solid #f5f5f5;}
+        .item-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
+        input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--green); margin-right: 12px; flex-shrink: 0;}
+        .item-name { flex: 1; word-break: break-all; }
+        .item-meta { font-size: 0.8em; color: #999; margin-left: 10px; flex-shrink: 0; display: flex; align-items: center; gap: 5px;}
+        .done { text-decoration: line-through; color: #ccc; }
+        
+        /* Buttons */
+        .btn-action { background: none; border: none; font-size: 1.2em; cursor: pointer; color: #aaa; padding: 0 5px;}
+        .btn-main { display: block; width: 100%; background: var(--bg); color: var(--accent); border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;}
+        .btn-buy { background: var(--green); color: white; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer;}
+        .btn-buy:disabled { background: #ccc; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; }
+        .modal { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .modal h3 { margin-top: 0; color: var(--accent); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9em; font-weight: bold;}
+        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-family: inherit;}
+        .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+        .btn-save { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer;}
+        .btn-cancel { background: #eee; color: #666; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer;}
+
+        /* History */
+        .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; }
+        
+        /* Hide content */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div id="hpDisplay">HP: 100/100</div>
-        <div id="goldDisplay">金币: 0 G</div>
+    <!-- Top Info -->
+    <div class="info-bar">
+        <div class="time-row" id="timeDisplay">加载时间...</div>
+        <div class="weather-row" id="weatherDisplay">🌤️ 天气加载中...</div>
     </div>
 
-    <div class="card">
-        <h3>今日任务 (Dailies)</h3>
-        <div id="taskList"></div>
+    <!-- Status -->
+    <div class="status-bar">
+        <div id="hpDisplay">HP: 100/100 ❤️</div>
+        <div id="goldDisplay">金币: 0 💰</div>
     </div>
 
-    <div class="card">
-        <h3>奖励商店 (Rewards)</h3>
-        <div class="shop-item">
-            <span>免做便当卡 🍱</span>
-            <button onclick="buyReward(100, '免做便当')">100 G</button>
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('tasks')">📋 任务</div>
+        <div class="tab" onclick="switchTab('shop')">🛒 商城</div>
+        <div class="tab" onclick="switchTab('history')">📅 历史</div>
+    </div>
+
+    <!-- Tab 1: Tasks -->
+    <div id="tasks-tab" class="tab-content active">
+        <div class="card">
+            <div class="section-title">日常任务 (Dailies)</div>
+            <div id="dailyList"></div>
         </div>
-        <div class="shop-item">
-            <span>连刷霸总短剧 📺</span>
-            <button onclick="buyReward(500, '看短剧')">500 G</button>
+        <div class="card">
+            <div class="section-title">主线任务 (Main)</div>
+            <div id="mainList"></div>
         </div>
-        <div class="shop-item">
-            <span>豪华烤鸡排放纵餐 🍗</span>
-            <button onclick="buyReward(800, '吃鸡排')">800 G</button>
+        <div class="card">
+            <div class="section-title">支线任务 (Side)</div>
+            <div id="sideList"></div>
         </div>
-        <div class="shop-item">
-            <span>买新首饰/安踏装备 🛍️</span>
-            <button onclick="buyReward(3000, '买装备')">3000 G</button>
+        <button class="btn-main" onclick="openTaskModal()">+ 添加新任务</button>
+    </div>
+
+    <!-- Tab 2: Shop -->
+    <div id="shop-tab" class="tab-content">
+        <div class="card">
+            <div class="section-title">奖励兑换站</div>
+            <div id="shopList"></div>
+        </div>
+        <button class="btn-main" onclick="openRewardModal()">+ 添加新奖励</button>
+    </div>
+
+    <!-- Tab 3: History -->
+    <div id="history-tab" class="tab-content">
+        <div class="card">
+            <div class="section-title">打卡与金币记录</div>
+            <div id="historyList">暂无记录，努力打卡吧！</div>
+        </div>
+    </div>
+
+    <!-- Modal: Edit/Add Task -->
+    <div id="taskModal" class="modal-overlay">
+        <div class="modal">
+            <h3 id="taskModalTitle">添加任务</h3>
+            <input type="hidden" id="taskId">
+            <div class="form-group">
+                <label>任务名称</label>
+                <input type="text" id="taskName" placeholder="例如: 记账 / 去旅行">
+            </div>
+            <div class="form-group">
+                <label>任务类型</label>
+                <select id="taskType">
+                    <option value="daily">日常 (每日刷新)</option>
+                    <option value="main">主线 (长期目标)</option>
+                    <option value="side">支线 (额外目标)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>消耗 HP (回血任务请填负数，如 -30)</label>
+                <input type="number" id="taskHp" value="10">
+            </div>
+            <div class="form-group">
+                <label>获得 金币</label>
+                <input type="number" id="taskGold" value="20">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal('taskModal')">取消</button>
+                <button class="btn-save" onclick="saveTask()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Edit/Add Reward -->
+    <div id="rewardModal" class="modal-overlay">
+        <div class="modal">
+            <h3 id="rewardModalTitle">添加奖励</h3>
+            <input type="hidden" id="rewardId">
+            <div class="form-group">
+                <label>奖励名称</label>
+                <input type="text" id="rewardName" placeholder="例如: 吃一顿大餐">
+            </div>
+            <div class="form-group">
+                <label>需要金币</label>
+                <input type="number" id="rewardGold" value="500">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal('rewardModal')">取消</button>
+                <button class="btn-save" onclick="saveReward()">保存</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // 核心数据模型
-        let state = JSON.parse(localStorage.getItem('lifeRpgState')) || {
+        // --- 1. 数据初始化 ---
+        let defaultState = {
             hp: 100,
             gold: 0,
             lastLoginDate: new Date().toDateString(),
             tasks: [
-                { id: 1, name: "记账", cost: 5, reward: 10, done: false },
-                { id: 2, name: "敷面膜", cost: 5, reward: 10, done: false },
-                { id: 3, name: "备菜/准备便当", cost: 15, reward: 20, done: false },
-                { id: 4, name: "运动打卡", cost: 25, reward: 50, done: false },
-                { id: 5, name: "亲亲快快迷你", cost: -30, reward: 0, done: false } // 负cost代表回血
-            ]
+                { id: Date.now()+1, text: "记账", type: "daily", hpCost: 5, goldReward: 10, done: false },
+                { id: Date.now()+2, text: "敷面膜", type: "daily", hpCost: 5, goldReward: 10, done: false },
+                { id: Date.now()+3, text: "备菜/准备便当", type: "daily", hpCost: 15, goldReward: 20, done: false },
+                { id: Date.now()+4, text: "运动打卡", type: "daily", hpCost: 25, goldReward: 50, done: false },
+                { id: Date.now()+5, text: "亲亲快快迷你", type: "daily", hpCost: -30, goldReward: 0, done: false },
+                { id: Date.now()+6, text: "10月旅行准备", type: "main", hpCost: 10, goldReward: 100, done: false },
+                { id: Date.now()+7, text: "存RM150K节点", type: "main", hpCost: 0, goldReward: 500, done: false },
+                { id: Date.now()+8, text: "周更Vlog素材", type: "side", hpCost: 20, goldReward: 80, done: false }
+            ],
+            shop: [
+                { id: Date.now()+10, text: "今日免做便当卡 🍱", cost: 100 },
+                { id: Date.now()+11, text: "连刷三集霸总短剧 📺", cost: 500 },
+                { id: Date.now()+12, text: "豪华烤鸡排放纵餐 🍗", cost: 800 },
+                { id: Date.now()+13, text: "买新首饰/安踏装备 🛍️", cost: 3000 }
+            ],
+            history: []
         };
 
-        // 跨日刷新逻辑：如果今天不是上次登录的日期，重置HP和任务状态，保留金币
-        if (state.lastLoginDate !== new Date().toDateString()) {
+        let state = JSON.parse(localStorage.getItem('lifeRpgState_v4')) || defaultState;
+
+        // --- 2. 跨日刷新逻辑 ---
+        let todayStr = new Date().toDateString();
+        if (state.lastLoginDate !== todayStr) {
+            let doneDailies = state.tasks.filter(t => t.type === 'daily' && t.done).length;
+            state.history.unshift({
+                date: state.lastLoginDate,
+                info: `完成日常: ${doneDailies} 项 | 结余金币: ${state.gold} G`
+            });
+            if(state.history.length > 30) state.history.pop();
+
             state.hp = 100;
-            state.tasks.forEach(t => t.done = false);
-            state.lastLoginDate = new Date().toDateString();
+            state.tasks.forEach(t => { 
+                if(t.type === 'daily') t.done = false; 
+            });
+            state.lastLoginDate = todayStr;
             saveData();
         }
 
         function saveData() {
-            localStorage.setItem('lifeRpgState', JSON.stringify(state));
+            localStorage.setItem('lifeRpgState_v4', JSON.stringify(state));
             render();
         }
 
+        // --- 3. 渲染 UI ---
+        function render() {
+            document.getElementById('hpDisplay').innerText = `HP: ${state.hp}/100 ❤️`;
+            document.getElementById('goldDisplay').innerText = `金币: ${state.gold} 💰`;
+
+            const renderTaskList = (type, containerId) => {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                let tasks = state.tasks.filter(t => t.type === type);
+                if(tasks.length === 0) container.innerHTML = '<div style="color:#ccc; font-size:0.9em;">暂无任务</div>';
+                
+                tasks.forEach(task => {
+                    let hpText = task.hpCost < 0 ? `+${Math.abs(task.hpCost)}HP` : `-${task.hpCost}HP`;
+                    let goldText = task.goldReward > 0 ? ` / +${task.goldReward}G` : '';
+                    let nameClass = task.done ? 'item-name done' : 'item-name';
+                    
+                    container.innerHTML += `
+                        <div class="item-row">
+                            <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                            <span class="${nameClass}">${task.text}</span>
+                            <div class="item-meta">
+                                <span>[${hpText}${goldText}]</span>
+                                <button class="btn-action" onclick="openTaskModal(${task.id})">✏️</button>
+                                <button class="btn-action" onclick="deleteTask(${task.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            };
+            renderTaskList('daily', 'dailyList');
+            renderTaskList('main', 'mainList');
+            renderTaskList('side', 'sideList');
+
+            const shopList = document.getElementById('shopList');
+            shopList.innerHTML = '';
+            state.shop.forEach(item => {
+                shopList.innerHTML += `
+                    <div class="item-row">
+                        <span class="item-name">${item.text}</span>
+                        <div class="item-meta">
+                            <button class="btn-buy" onclick="buyReward(${item.id})" ${state.gold < item.cost ? 'disabled' : ''}>${item.cost} G</button>
+                            <button class="btn-action" onclick="openRewardModal(${item.id})">✏️</button>
+                            <button class="btn-action" onclick="deleteReward(${item.id})">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const historyList = document.getElementById('historyList');
+            if (state.history.length > 0) {
+                historyList.innerHTML = '';
+                state.history.forEach(h => {
+                    historyList.innerHTML += `
+                        <div class="history-item">
+                            <span style="color:var(--accent); font-weight:bold;">${h.date.substring(4, 10)}</span>
+                            <span style="color:#888; font-size:0.9em;">${h.info}</span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // --- 4. 业务逻辑 (打勾、购买等) ---
         function toggleTask(id) {
             let task = state.tasks.find(t => t.id === id);
             if (!task.done) {
-                // 打勾
-                if(state.hp - task.cost < 0) { alert("HP不足！先去和快快迷你玩一会回血吧！"); return; }
-                state.hp = Math.min(100, state.hp - task.cost); // 上限100
-                state.gold += task.reward;
+                if (task.hpCost > 0 && state.hp - task.hpCost < 0) {
+                    alert("HP不足！先去和快快迷你亲亲回血吧！");
+                    render(); 
+                    return;
+                }
+                state.hp = Math.min(100, state.hp - task.hpCost);
+                state.gold += task.goldReward;
                 task.done = true;
             } else {
-                // 取消打勾
-                state.hp = Math.min(100, state.hp + task.cost);
-                state.gold -= task.reward;
+                state.hp = Math.min(100, state.hp + task.hpCost);
+                state.gold -= task.goldReward;
                 task.done = false;
             }
             saveData();
         }
 
-        function buyReward(cost, name) {
-            if (state.gold >= cost) {
-                if(confirm(`确认花费 ${cost}G 兑换【${name}】吗？`)) {
-                    state.gold -= cost;
+        function buyReward(id) {
+            let item = state.shop.find(i => i.id === id);
+            if (state.gold >= item.cost) {
+                if (confirm(`确认花费 ${item.cost}G 兑换【${item.text}】吗？`)) {
+                    state.gold -= item.cost;
                     alert("兑换成功！好好享受吧！");
                     saveData();
                 }
-            } else {
-                alert("金币不足，继续完成日常任务吧！");
             }
         }
 
-        function render() {
-            document.getElementById('hpDisplay').innerText = `HP: ${state.hp}/100`;
-            document.getElementById('goldDisplay').innerText = `金币: ${state.gold} G`;
-            
-            const list = document.getElementById('taskList');
-            list.innerHTML = '';
-            state.tasks.forEach(task => {
-                const div = document.createElement('div');
-                div.className = 'task-item';
-                // 判断如果是回血任务，文字颜色特殊显示
-                const hpText = task.cost < 0 ? `+${Math.abs(task.cost)}HP` : `-${task.cost}HP`;
-                const goldText = task.reward > 0 ? ` / +${task.reward}G` : '';
-                
-                div.innerHTML = `
-                    <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})">
-                    <span style="text-decoration: ${task.done ? 'line-through' : 'none'}; color: ${task.done ? '#999' : '#5c4d43'}">${task.name}</span>
-                    <span class="task-meta">${hpText}${goldText}</span>
-                `;
-                list.appendChild(div);
-            });
+        function deleteTask(id) {
+            if(confirm("确定删除这个任务吗？")) {
+                state.tasks = state.tasks.filter(t => t.id !== id);
+                saveData();
+            }
         }
 
-        // 初始化渲染
+        function deleteReward(id) {
+            if(confirm("确定删除这个奖励吗？")) {
+                state.shop = state.shop.filter(i => i.id !== id);
+                saveData();
+            }
+        }
+
+        // --- 5. 模态框逻辑 ---
+        function openTaskModal(id = null) {
+            document.getElementById('taskModal').style.display = 'flex';
+            if (id) {
+                let task = state.tasks.find(t => t.id === id);
+                document.getElementById('taskModalTitle').innerText = "修改任务";
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('taskName').value = task.text;
+                document.getElementById('taskType').value = task.type;
+                document.getElementById('taskHp').value = task.hpCost;
+                document.getElementById('taskGold').value = task.goldReward;
+            } else {
+                document.getElementById('taskModalTitle').innerText = "添加新任务";
+                document.getElementById('taskId').value = "";
+                document.getElementById('taskName').value = "";
+                document.getElementById('taskHp').value = "10";
+                document.getElementById('taskGold').value = "20";
+            }
+        }
+
+        function saveTask() {
+            let id = document.getElementById('taskId').value;
+            let name = document.getElementById('taskName').value.trim();
+            if(!name) return alert("任务名称不能为空！");
+            
+            let newTask = {
+                id: id ? parseInt(id) : Date.now(),
+                text: name,
+                type: document.getElementById('taskType').value,
+                hpCost: parseInt(document.getElementById('taskHp').value) || 0,
+                goldReward: parseInt(document.getElementById('taskGold').value) || 0,
+                done: false
+            };
+
+            if (id) {
+                let index = state.tasks.findIndex(t => t.id == id);
+                newTask.done = state.tasks[index].done; 
+                state.tasks[index] = newTask;
+            } else {
+                state.tasks.push(newTask);
+            }
+            closeModal('taskModal');
+            saveData();
+        }
+
+        function openRewardModal(id = null) {
+            document.getElementById('rewardModal').style.display = 'flex';
+            if (id) {
+                let item = state.shop.find(i => i.id === id);
+                document.getElementById('rewardModalTitle').innerText = "修改奖励";
+                document.getElementById('rewardId').value = item.id;
+                document.getElementById('rewardName').value = item.text;
+                document.getElementById('rewardGold').value = item.cost;
+            } else {
+                document.getElementById('rewardModalTitle').innerText = "添加新奖励";
+                document.getElementById('rewardId').value = "";
+                document.getElementById('rewardName').value = "";
+                document.getElementById('rewardGold').value = "500";
+            }
+        }
+
+        function saveReward() {
+            let id = document.getElementById('rewardId').value;
+            let name = document.getElementById('rewardName').value.trim();
+            if(!name) return alert("奖励名称不能为空！");
+            
+            let newItem = {
+                id: id ? parseInt(id) : Date.now(),
+                text: name,
+                cost: parseInt(document.getElementById('rewardGold').value) || 0
+            };
+
+            if (id) {
+                let index = state.shop.findIndex(i => i.id == id);
+                state.shop[index] = newItem;
+            } else {
+                state.shop.push(newItem);
+            }
+            closeModal('rewardModal');
+            saveData();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // --- 6. 辅助工具 ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long', hour: '2-digit', minute:'2-digit', second:'2-digit' };
+            document.getElementById('timeDisplay').innerText = now.toLocaleString('zh-CN', options);
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        async function fetchWeather() {
+            try {
+                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=3.0333,3.1073,3.1390&longitude=101.4500,101.6067,101.6869&current_weather=true");
+                const data = await res.json();
+                
+                const klangTemp = data[0].current_weather.temperature;
+                const pjTemp = data[1].current_weather.temperature;
+                const klTemp = data[2].current_weather.temperature;
+
+                document.getElementById('weatherDisplay').innerHTML = `
+                    🌤️ Klang: ${klangTemp}°C | PJ: ${pjTemp}°C | KL: ${klTemp}°C
+                `;
+            } catch (e) {
+                document.getElementById('weatherDisplay').innerText = "天气加载失败，请检查网络";
+            }
+        }
+        fetchWeather();
+
         render();
     </script>
 </body>

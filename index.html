@@ -3,43 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ys Life RPG V10</title>
+    <title>Ys Life RPG V11</title>
     <style>
-        :root { --bg: #faf7f2; --text: #5c4d43; --accent: #e2b49a; --accent-hover: #d1a086; --box: #ffffff; --green: #a8c3a6; --red: #e09f9f; --gold: #ffd700; }
+        :root { --bg: #faf7f2; --text: #5c4d43; --accent: #e2b49a; --accent-hover: #d1a086; --box: #ffffff; --green: #a8c3a6; --red: #e09f9f; --gold: #ffd700; --blue: #3b82f6; }
         body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); padding: 15px; max-width: 600px; margin: 0 auto; line-height: 1.5; }
         
-        /* 顶部大标题，留出空间 */
-        .app-title { text-align: center; font-size: 1.5em; font-weight: 800; color: var(--accent); margin: 5px 0 20px 0; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(226,180,154,0.3); }
+        .app-title { text-align: center; font-size: 1.4em; font-weight: 800; color: var(--accent); margin: 5px 0 15px 0; letter-spacing: 2px; text-shadow: 1px 1px 2px rgba(226,180,154,0.3); }
 
-        /* 柴犬区域 */
+        /* 柴犬萌宠专属区域 */
         .shiba-house { display: flex; justify-content: center; gap: 45px; margin-bottom: 20px; padding: 25px 15px 20px 15px; background: #fffaf0; border: 2px dashed var(--accent); border-radius: 15px; position: relative; z-index: 50; }
         .shiba-pet { position: relative; text-align: center; cursor: pointer; user-select: none; }
         
-        /* 呼吸微动效，让狗狗活起来 */
-        @keyframes breathe {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-4px) scale(1.02); }
-        }
-        .shiba-icon { width: 95px; height: 95px; margin: 0 auto 8px; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.12)); animation: breathe 3s infinite ease-in-out; transition: transform 0.2s; }
-        .shiba-pet:active .shiba-icon { transform: scale(0.9); }
-        .shiba-icon-2 { animation-delay: 1.5s; /* 让两只狗呼吸错开 */ }
-
+        /* 灵动动画集合 */
+        @keyframes breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-4px) scale(1.02); } }
+        @keyframes earL { 0%, 100%, 20% { transform: rotate(0deg); } 10% { transform: rotate(-12deg); } }
+        @keyframes earR { 0%, 100%, 20% { transform: rotate(0deg); } 10% { transform: rotate(12deg); } }
+        
+        .shiba-icon { width: 100px; height: 100px; margin: 0 auto 8px; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12)); animation: breathe 3s infinite ease-in-out; transition: transform 0.2s; }
+        .shiba-pet:active .shiba-icon { transform: scale(0.92); }
+        .shiba-icon-2 { animation-delay: 1.5s; }
+        
+        .ear-left { transform-origin: 28px 55px; animation: earL 5s infinite; }
+        .ear-right { transform-origin: 72px 55px; animation: earR 5s infinite; animation-delay: 0.3s; }
+        
         .shiba-name { font-weight: bold; font-size: 0.9em; color: var(--accent); background: #fff; padding: 3px 14px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 2px 4px rgba(226,180,154,0.2);}
         
-        /* 对话气泡 - 向下弹出，永不遮挡 */
+        /* 向下弹出的对话气泡 */
         .speech-bubble {
             position: absolute; top: 110%; left: 50%; transform: translateX(-50%) translateY(10px);
             background: #ffffff; border: 2px solid var(--accent);
             padding: 10px 14px; border-radius: 14px; font-size: 0.85em; color: var(--text);
             width: max-content; max-width: 180px; opacity: 0; pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 6px 15px rgba(0,0,0,0.12); z-index: 999; line-height: 1.4; text-align: center;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 6px 15px rgba(0,0,0,0.15); z-index: 999; line-height: 1.4; text-align: center;
         }
-        .speech-bubble::before {
-            content: ''; position: absolute; bottom: 100%; left: 50%; margin-left: -6px;
-            border-width: 6px; border-style: solid; border-color: transparent transparent var(--accent) transparent;
-        }
+        .speech-bubble::before { content: ''; position: absolute; bottom: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: transparent transparent var(--accent) transparent; }
 
-        /* 可爱互动菜单浮窗 */
+        /* 投喂浮窗菜单 */
         .feed-menu {
             display: none; position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
             background: #ffffff; border: 2px solid var(--accent); border-radius: 12px;
@@ -47,33 +46,28 @@
         }
         .feed-menu.active { display: block; animation: popIn 0.2s ease-out; }
         @keyframes popIn { from { opacity: 0; transform: translateX(-50%) scale(0.9); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
-        
         .feed-menu-title { font-weight: bold; color: var(--accent); margin-bottom: 8px; font-size: 0.85em; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
-        .feed-btn {
-            display: block; width: 100%; background: #fffaf0; border: 1px solid #f3d5c1;
-            padding: 8px 0; margin: 5px 0; border-radius: 8px; font-size: 0.85em; font-weight: bold;
-            color: var(--text); cursor: pointer; transition: all 0.2s;
-        }
+        .feed-btn { display: block; width: 100%; background: #fffaf0; border: 1px solid #f3d5c1; padding: 8px 0; margin: 5px 0; border-radius: 8px; font-size: 0.85em; font-weight: bold; color: var(--text); cursor: pointer; transition: all 0.2s; }
         .feed-btn:hover, .feed-btn:active { background: var(--accent); color: white; transform: scale(1.05); }
 
-        /* Top Info Bar */
+        /* UI 基础框架 */
         .info-bar { background: var(--box); padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 15px; font-size: 0.9em; }
         .time-row { font-weight: bold; font-size: 1.1em; color: var(--accent); margin-bottom: 5px; }
         .weather-row { color: #888; font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 8px; font-weight: bold;}
-        
-        /* Status Bar */
         .status-bar { display: flex; justify-content: space-between; background: var(--accent); color: white; padding: 12px 20px; border-radius: 12px; font-weight: bold; font-size: 1.1em; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(226, 180, 154, 0.3); }
 
-        /* Tabs */
-        .tabs { display: flex; gap: 4px; margin-bottom: 15px; }
-        .tab { flex: 1; text-align: center; padding: 10px 2px; background: #eee; border-radius: 8px; cursor: pointer; font-weight: bold; color: #888; font-size: 0.85em; }
+        /* 标签栏自适应 */
+        .tabs { display: flex; gap: 3px; margin-bottom: 15px; overflow-x: auto; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab { flex: 1; text-align: center; padding: 10px 0; background: #eee; border-radius: 8px; cursor: pointer; font-weight: bold; color: #888; font-size: 0.8em; min-width: 50px;}
         .tab.active { background: var(--box); color: var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        /* Card / List */
+        /* 列表与卡片 */
         .card { background: var(--box); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 10px; border-bottom: 2px dashed #eee; padding-bottom: 5px; color: var(--accent); display: flex; justify-content: space-between; align-items: center;}
         
-        /* Goal Card */
         .goal-card { background: #fdf5f1; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--accent); }
         .goal-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--accent); margin-bottom: 8px; font-size: 1.05em;}
         .goal-sub { font-size: 0.8em; color: #888; margin-bottom: 10px; }
@@ -81,13 +75,10 @@
         .goal-input-row input { flex: 1; padding: 8px; border: 1px solid #e2b49a; border-radius: 6px; box-sizing: border-box; font-family: inherit;}
         .goal-input-row button { background: var(--accent); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer;}
         
-        /* Gacha Box */
         .gacha-box { background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); border: 2px solid #ffd700; border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 15px; }
         .gacha-title { font-weight: bold; font-size: 1.2em; color: #d4af37; margin-bottom: 5px; }
-        .gacha-desc { font-size: 0.85em; color: #666; margin-bottom: 15px; }
         .btn-gacha { background: #ffd700; color: #8b6508; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 1.1em; cursor: pointer; box-shadow: 0 4px 6px rgba(255, 215, 0, 0.3); }
 
-        /* Achievement Item */
         .achi-item { display: flex; align-items: center; padding: 12px; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #ddd; }
         .achi-item.claimed { border-left: 4px solid var(--gold); background: #fffdf0; opacity: 0.8; }
         .achi-icon { font-size: 2em; margin-right: 15px; }
@@ -97,7 +88,6 @@
         .btn-claim { background: var(--gold); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
         .btn-claim.disabled { background: #ccc; cursor: not-allowed; }
 
-        /* Common List */
         .item-row { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95em; padding-bottom: 8px; border-bottom: 1px solid #f5f5f5;}
         .item-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--green); margin-right: 12px; flex-shrink: 0;}
@@ -105,13 +95,21 @@
         .item-meta { font-size: 0.8em; color: #999; margin-left: 10px; flex-shrink: 0; display: flex; align-items: center; gap: 5px;}
         .done { text-decoration: line-through; color: #ccc; }
         
-        /* Buttons */
         .btn-action { background: none; border: none; font-size: 1.2em; cursor: pointer; color: #aaa; padding: 0 5px;}
         .btn-main { display: block; width: 100%; background: var(--bg); color: var(--accent); border: 2px dashed var(--accent); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;}
         .btn-buy { background: var(--green); color: white; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer;}
         .btn-buy:disabled { background: #ccc; }
 
-        /* Modal */
+        /* 云端设置面板 */
+        .cloud-box { background: #f0f7ff; border: 1px solid #cce0ff; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        .cloud-title { font-weight: bold; color: var(--blue); margin-bottom: 10px; font-size: 1.1em; display: flex; align-items: center; gap: 5px;}
+        .cloud-desc { font-size: 0.85em; color: #666; margin-bottom: 12px; }
+        .cloud-input { width: 100%; padding: 10px; border: 1px solid #b3d4ff; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; font-family: monospace;}
+        .cloud-btn-group { display: flex; gap: 10px; }
+        .btn-cloud-up { flex: 1; background: var(--blue); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(59,130,246,0.3);}
+        .btn-cloud-down { flex: 1; background: #fff; color: var(--blue); border: 1px solid var(--blue); padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* 模态框及进度条 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .modal h3 { margin-top: 0; color: var(--accent); }
@@ -121,78 +119,74 @@
         .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
         .btn-save { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer;}
         .btn-cancel { background: #eee; color: #666; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer;}
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
         
-        /* Calendar Styles */
+        .progress-container { width: 100%; background: #eee; border-radius: 10px; height: 16px; margin: 10px 0; overflow: hidden; position: relative;}
+        .progress-bar { height: 100%; background: var(--green); border-radius: 10px; transition: width 0.4s ease-out; }
+        .progress-text { position: absolute; width: 100%; text-align: center; top: 0; left: 0; font-size: 0.75em; line-height: 16px; color: #333; font-weight: bold;}
+        .history-item { margin-bottom: 8px; font-size: 0.9em; padding-left: 10px; border-left: 3px solid var(--accent); }
+        
+        /* 日历 */
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .calendar-header button { background: none; border: none; font-size: 1.2em; color: var(--accent); cursor: pointer; font-weight: bold; padding: 5px 10px;}
         .calendar-title { font-weight: bold; font-size: 1.1em; cursor: pointer; padding: 5px 10px; border-radius: 6px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .calendar-day-header { font-size: 0.8em; color: #999; font-weight: bold; padding-bottom: 5px; border-bottom: 1px solid #eee; margin-bottom: 5px;}
         .calendar-day { padding: 10px 5px; border-radius: 6px; cursor: pointer; font-size: 0.9em; border: 1px solid transparent;}
-        .calendar-day:hover { background: #f5f5f5; }
         .calendar-day.today { border: 2px solid var(--accent); font-weight: bold; }
         .calendar-day.has-data { background: #fdf5f1; color: var(--accent); font-weight: bold; }
         .calendar-day.has-data::after { content: ''; display: block; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; margin: 2px auto 0; }
         .calendar-day.empty { color: transparent; pointer-events: none; }
         .calendar-day.selected { background: var(--accent); color: white; }
-        
         .month-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; display: none; margin-top: 15px;}
         .month-grid.active { display: grid; }
         .month-item { padding: 15px; background: #eee; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        
-        .progress-container { width: 100%; background: #eee; border-radius: 10px; height: 16px; margin: 10px 0; overflow: hidden; position: relative;}
-        .progress-bar { height: 100%; background: var(--green); border-radius: 10px; transition: width 0.4s ease-out; }
-        .progress-text { position: absolute; width: 100%; text-align: center; top: 0; left: 0; font-size: 0.75em; line-height: 16px; color: #333; font-weight: bold;}
-        .history-item { margin-bottom: 8px; font-size: 0.9em; padding-left: 10px; border-left: 3px solid var(--accent); }
     </style>
 </head>
 <body>
 
-    <!-- 顶端居中大标题，拉开距离防止遮挡 -->
     <div class="app-title">✨ Ys Life RPG ✨</div>
 
-    <!-- 🐕 全新绘制：超可爱呼吸微动效 SVG 柴犬互动区 -->
+    <!-- 🐕 V11 萌力觉醒：超精致胖嘟嘟柴犬 (星空眼 + 小爪子) -->
     <div class="shiba-house">
-        <!-- 快快 (蓝色系) -->
+        <!-- 快快 (蓝) -->
         <div class="shiba-pet" onclick="toggleFeedMenu('kuaikuai', event)">
             <div class="shiba-icon">
                 <svg viewBox="0 0 100 100" width="100%" height="100%">
-                    <!-- 耳朵 -->
-                    <polygon points="18,30 38,42 28,55" fill="#f4a261" />
-                    <polygon points="82,30 62,42 72,55" fill="#f4a261" />
-                    <polygon points="23,35 34,42 29,48" fill="#ffb5a7" />
-                    <polygon points="77,35 66,42 71,48" fill="#ffb5a7" />
-                    <!-- 脸庞 -->
-                    <circle cx="50" cy="58" r="33" fill="#f4a261" />
-                    <path d="M17,64 Q50,102 83,64 Q85,46 50,48 Q15,46 17,64" fill="#ffffff" />
-                    <!-- 腮红 -->
-                    <circle cx="28" cy="60" r="5" fill="#ffb5a7" opacity="0.8"/>
-                    <circle cx="72" cy="60" r="5" fill="#ffb5a7" opacity="0.8"/>
-                    <!-- 眼睛与高光 -->
-                    <circle cx="36" cy="50" r="4.5" fill="#2d3748" />
-                    <circle cx="64" cy="50" r="4.5" fill="#2d3748" />
-                    <circle cx="37.5" cy="48" r="1.5" fill="#ffffff" />
-                    <circle cx="65.5" cy="48" r="1.5" fill="#ffffff" />
-                    <!-- 白豆豆眉毛 -->
-                    <ellipse cx="36" cy="42" rx="4" ry="2" fill="#ffffff" transform="rotate(-15 36 42)"/>
-                    <ellipse cx="64" cy="42" rx="4" ry="2" fill="#ffffff" transform="rotate(15 64 42)"/>
-                    <!-- 鼻子 -->
+                    <!-- 动态耳朵 -->
+                    <g class="ear-left"><polygon points="22,30 40,42 28,55" fill="#f4a261" /><polygon points="26,34 36,42 29,48" fill="#ffd1dc" /></g>
+                    <g class="ear-right"><polygon points="78,30 60,42 72,55" fill="#f4a261" /><polygon points="74,34 64,42 71,48" fill="#ffd1dc" /></g>
+                    <!-- 大圆胖脸 -->
+                    <circle cx="50" cy="58" r="34" fill="#f4a261" />
+                    <!-- 扩大白脸颊 -->
+                    <path d="M15,64 Q50,105 85,64 Q86,45 50,47 Q14,45 15,64" fill="#ffffff" />
+                    <!-- 粉红腮红 -->
+                    <circle cx="26" cy="62" r="6" fill="#ffb5a7" opacity="0.85"/>
+                    <circle cx="74" cy="62" r="6" fill="#ffb5a7" opacity="0.85"/>
+                    <!-- 星空大眼睛 -->
+                    <circle cx="35" cy="50" r="5" fill="#2d3748" />
+                    <circle cx="65" cy="50" r="5" fill="#2d3748" />
+                    <circle cx="36" cy="48" r="2" fill="#ffffff" />
+                    <circle cx="66" cy="48" r="2" fill="#ffffff" />
+                    <circle cx="33" cy="51" r="0.8" fill="#ffffff" />
+                    <circle cx="63" cy="51" r="0.8" fill="#ffffff" />
+                    <!-- 白豆豆眉 -->
+                    <ellipse cx="35" cy="41" rx="4.5" ry="2.5" fill="#ffffff" transform="rotate(-15 35 41)"/>
+                    <ellipse cx="65" cy="41" rx="4.5" ry="2.5" fill="#ffffff" transform="rotate(15 65 41)"/>
+                    <!-- 鼻子与微笑嘴 -->
                     <ellipse cx="50" cy="59" rx="4.5" ry="3" fill="#2d3748" />
-                    <!-- 嘴巴与吐出的小粉红舌头 -->
                     <path d="M43,65 Q50,71 57,65" fill="none" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round" />
                     <path d="M47,67 Q50,73 53,67 Z" fill="#ff85a2" /> 
-                    <!-- 蓝项圈与小骨头 -->
-                    <path d="M25,78 Q50,91 75,78 L70,85 Q50,97 30,85 Z" fill="#3b82f6" />
-                    <ellipse cx="50" cy="88" rx="6" ry="3" fill="#e0e7ff" />
+                    <!-- 蓝项圈 -->
+                    <path d="M23,79 Q50,94 77,79 L72,86 Q50,99 28,86 Z" fill="#3b82f6" />
+                    <ellipse cx="50" cy="89" rx="6" ry="3.5" fill="#e0e7ff" />
+                    <!-- 激萌小爪子 (Paws) -->
+                    <ellipse cx="38" cy="83" rx="6" ry="4" fill="#ffffff" stroke="#f0f0f0" stroke-width="1"/>
+                    <ellipse cx="62" cy="83" rx="6" ry="4" fill="#ffffff" stroke="#f0f0f0" stroke-width="1"/>
                 </svg>
             </div>
             <div class="shiba-name">快快</div>
-            <!-- 对话气泡 (向下弹出) -->
             <div id="bubble-kuaikuai" class="speech-bubble"></div>
-            <!-- 可爱互动菜单悬浮窗 -->
+            <!-- 投喂菜单 -->
             <div id="menu-kuaikuai" class="feed-menu" onclick="event.stopPropagation()">
                 <div class="feed-menu-title">照顾快快 🐾</div>
                 <button class="feed-btn" onclick="feedPet('快快', 'feed', event)">🍖 喂肉干</button>
@@ -202,43 +196,37 @@
             </div>
         </div>
         
-        <!-- 迷你 (红橙色系) -->
+        <!-- 迷你 (红) -->
         <div class="shiba-pet" onclick="toggleFeedMenu('mini', event)">
             <div class="shiba-icon shiba-icon-2">
                 <svg viewBox="0 0 100 100" width="100%" height="100%">
-                    <!-- 耳朵 -->
-                    <polygon points="18,30 38,42 28,55" fill="#e76f51" />
-                    <polygon points="82,30 62,42 72,55" fill="#e76f51" />
-                    <polygon points="23,35 34,42 29,48" fill="#ffb5a7" />
-                    <polygon points="77,35 66,42 71,48" fill="#ffb5a7" />
-                    <!-- 脸庞 -->
-                    <circle cx="50" cy="58" r="33" fill="#e76f51" />
-                    <path d="M17,64 Q50,102 83,64 Q85,46 50,48 Q15,46 17,64" fill="#ffffff" />
-                    <!-- 腮红 -->
-                    <circle cx="28" cy="60" r="5" fill="#ffb5a7" opacity="0.8"/>
-                    <circle cx="72" cy="60" r="5" fill="#ffb5a7" opacity="0.8"/>
-                    <!-- 眼睛与高光 -->
-                    <circle cx="36" cy="50" r="4.5" fill="#2d3748" />
-                    <circle cx="64" cy="50" r="4.5" fill="#2d3748" />
-                    <circle cx="37.5" cy="48" r="1.5" fill="#ffffff" />
-                    <circle cx="65.5" cy="48" r="1.5" fill="#ffffff" />
-                    <!-- 白豆豆眉毛 -->
-                    <ellipse cx="36" cy="42" rx="4" ry="2" fill="#ffffff" transform="rotate(-15 36 42)"/>
-                    <ellipse cx="64" cy="42" rx="4" ry="2" fill="#ffffff" transform="rotate(15 64 42)"/>
-                    <!-- 鼻子 -->
+                    <g class="ear-left"><polygon points="22,30 40,42 28,55" fill="#e76f51" /><polygon points="26,34 36,42 29,48" fill="#ffd1dc" /></g>
+                    <g class="ear-right"><polygon points="78,30 60,42 72,55" fill="#e76f51" /><polygon points="74,34 64,42 71,48" fill="#ffd1dc" /></g>
+                    <circle cx="50" cy="58" r="34" fill="#e76f51" />
+                    <path d="M15,64 Q50,105 85,64 Q86,45 50,47 Q14,45 15,64" fill="#ffffff" />
+                    <circle cx="26" cy="62" r="6" fill="#ffb5a7" opacity="0.85"/>
+                    <circle cx="74" cy="62" r="6" fill="#ffb5a7" opacity="0.85"/>
+                    <circle cx="35" cy="50" r="5" fill="#2d3748" />
+                    <circle cx="65" cy="50" r="5" fill="#2d3748" />
+                    <circle cx="36" cy="48" r="2" fill="#ffffff" />
+                    <circle cx="66" cy="48" r="2" fill="#ffffff" />
+                    <circle cx="33" cy="51" r="0.8" fill="#ffffff" />
+                    <circle cx="63" cy="51" r="0.8" fill="#ffffff" />
+                    <ellipse cx="35" cy="41" rx="4.5" ry="2.5" fill="#ffffff" transform="rotate(-15 35 41)"/>
+                    <ellipse cx="65" cy="41" rx="4.5" ry="2.5" fill="#ffffff" transform="rotate(15 65 41)"/>
                     <ellipse cx="50" cy="59" rx="4.5" ry="3" fill="#2d3748" />
-                    <!-- 嘴巴与吐出的小粉红舌头 -->
                     <path d="M43,65 Q50,71 57,65" fill="none" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round" />
-                    <path d="M47,67 Q50,73 53,67 Z" fill="#ff85a2" />
+                    <path d="M47,67 Q50,73 53,67 Z" fill="#ff85a2" /> 
                     <!-- 红项圈与金铃铛 -->
-                    <path d="M25,78 Q50,91 75,78 L70,85 Q50,97 30,85 Z" fill="#ef4444" />
-                    <circle cx="50" cy="88" r="4.5" fill="#fbbf24" />
+                    <path d="M23,79 Q50,94 77,79 L72,86 Q50,99 28,86 Z" fill="#ef4444" />
+                    <circle cx="50" cy="89" r="5" fill="#fbbf24" />
+                    <!-- 激萌小爪子 -->
+                    <ellipse cx="38" cy="83" rx="6" ry="4" fill="#ffffff" stroke="#f0f0f0" stroke-width="1"/>
+                    <ellipse cx="62" cy="83" rx="6" ry="4" fill="#ffffff" stroke="#f0f0f0" stroke-width="1"/>
                 </svg>
             </div>
             <div class="shiba-name">迷你</div>
-            <!-- 对话气泡 (向下弹出) -->
             <div id="bubble-mini" class="speech-bubble"></div>
-            <!-- 可爱互动菜单悬浮窗 -->
             <div id="menu-mini" class="feed-menu" onclick="event.stopPropagation()">
                 <div class="feed-menu-title">照顾迷你 🐾</div>
                 <button class="feed-btn" onclick="feedPet('迷你', 'feed', event)">🍖 喂肉干</button>
@@ -249,70 +237,54 @@
         </div>
     </div>
 
-    <!-- Top Info -->
+    <!-- Status -->
     <div class="info-bar">
         <div class="time-row" id="timeDisplay">加载时间...</div>
         <div class="weather-row" id="weatherDisplay">正在同步气象卫星...</div>
     </div>
-
-    <!-- Status -->
     <div class="status-bar">
         <div id="hpDisplay">HP: 100/100 ❤️</div>
         <div id="goldDisplay">金币: 0 💰</div>
     </div>
 
-    <!-- Tabs -->
+    <!-- 6个标签页 -->
     <div class="tabs">
         <div class="tab active" onclick="switchTab('tasks')">📋 任务</div>
         <div class="tab" onclick="switchTab('goals')">🎯 目标</div>
         <div class="tab" onclick="switchTab('shop')">🛒 商城</div>
         <div class="tab" onclick="switchTab('achievements')">🏅 徽章</div>
         <div class="tab" onclick="switchTab('history')">📅 历史</div>
+        <div class="tab" onclick="switchTab('cloud')" style="color:var(--blue);">⚙️ 设置</div>
     </div>
 
     <!-- Tab 1: Tasks -->
     <div id="tasks-tab" class="tab-content active">
-        <div class="card">
-            <div class="section-title">日常任务 (Dailies)</div>
-            <div id="dailyList"></div>
-        </div>
-        <div class="card">
-            <div class="section-title">主线任务 (Main)</div>
-            <div id="mainList"></div>
-        </div>
-        <div class="card">
-            <div class="section-title">支线任务 (Side)</div>
-            <div id="sideList"></div>
-        </div>
+        <div class="card"><div class="section-title">日常任务 (Dailies)</div><div id="dailyList"></div></div>
+        <div class="card"><div class="section-title">主线任务 (Main)</div><div id="mainList"></div></div>
+        <div class="card"><div class="section-title">支线任务 (Side)</div><div id="sideList"></div></div>
         <button class="btn-main" onclick="openTaskModal()">+ 添加新任务</button>
     </div>
 
-    <!-- Tab 2: Goals (自定义多维度长线目标) -->
+    <!-- Tab 2: Goals -->
     <div id="goals-tab" class="tab-content">
         <div id="goalsContainer"></div>
         <button class="btn-main" onclick="openGoalModal()">+ 添加自定义主线目标</button>
     </div>
 
-    <!-- Tab 3: Shop & Gacha -->
+    <!-- Tab 3: Shop -->
     <div id="shop-tab" class="tab-content">
         <div class="gacha-box">
             <div class="gacha-title">🎁 惊喜盲盒</div>
-            <div class="gacha-desc">消耗 150G 抽取。可能抽中大额返现、体力恢复，也有可能面临非酋惩罚！</div>
+            <div class="gacha-desc">消耗 150G 抽取。可能抽中大额返现、体力恢复，也有极小概率非酋哦！</div>
             <button class="btn-gacha" onclick="playGacha()">🎲 150G 抽一次</button>
         </div>
-        <div class="card">
-            <div class="section-title">奖励兑换站</div>
-            <div id="shopList"></div>
-        </div>
+        <div class="card"><div class="section-title">奖励兑换站</div><div id="shopList"></div></div>
         <button class="btn-main" onclick="openRewardModal()">+ 添加新奖励</button>
     </div>
 
     <!-- Tab 4: Achievements -->
     <div id="achievements-tab" class="tab-content">
-        <div class="card">
-            <div class="section-title">荣誉陈列室 (Trophy Room)</div>
-            <div id="achiList"></div>
-        </div>
+        <div class="card"><div class="section-title">荣誉陈列室 (Trophy Room)</div><div id="achiList"></div></div>
         <button class="btn-main" onclick="openAchiModal()">+ 挂上新目标</button>
     </div>
 
@@ -332,27 +304,42 @@
                 </div>
                 <div class="calendar-grid" id="calendarDays"></div>
             </div>
-
             <div id="dailyDetail" class="daily-detail">
                 <div class="detail-date" id="detailDate"></div>
-                <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">当日结余金币 (日常点数)</div>
-                <div class="progress-container">
-                    <div class="progress-bar" id="detailGoldBar" style="width: 0%;"></div>
-                    <div class="progress-text" id="detailGoldText">0 G</div>
-                </div>
+                <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;">当日结余金币</div>
+                <div class="progress-container"><div class="progress-bar" id="detailGoldBar" style="width: 0%;"></div><div class="progress-text" id="detailGoldText">0 G</div></div>
                 <div style="font-weight: bold; margin: 15px 0 5px; color: var(--text);">完成记录:</div>
                 <div id="detailLogs"></div>
             </div>
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- Tab 6: Cloud (云端同步) -->
+    <div id="cloud-tab" class="tab-content">
+        <div class="cloud-box">
+            <div class="cloud-title">☁️ GitHub 云端同步</div>
+            <div class="cloud-desc">绑定 GitHub Token，实现跨设备无缝同步，数据永不丢失。(确保权限勾选了 gist)</div>
+            <label style="font-size:0.85em; font-weight:bold; color:var(--text); margin-bottom:4px; display:block;">GitHub 密钥 (PAT):</label>
+            <input type="password" id="githubToken" class="cloud-input" placeholder="ghp_xxxxxxxxxxxxxxx">
+            
+            <label style="font-size:0.85em; font-weight:bold; color:var(--text); margin-bottom:4px; margin-top:5px; display:block;">Gist ID (首次上传后自动生成):</label>
+            <input type="text" id="gistId" class="cloud-input" placeholder="留空即为新建存档">
+            
+            <div class="cloud-btn-group">
+                <button class="btn-cloud-up" onclick="uploadToCloud()">⬆️ 上传至云端</button>
+                <button class="btn-cloud-down" onclick="downloadFromCloud()">⬇️ 从云端下载</button>
+            </div>
+        </div>
+        <div class="card" style="font-size: 0.8em; color: #666;">
+            <strong>提示：</strong>如果你在另一台新设备登录，只需填入相同的【密钥】和【Gist ID】，点击“从云端下载”即可恢复所有数据！
+        </div>
+    </div>
+
+    <!-- Modals (隐藏表单) -->
     <div id="taskModal" class="modal-overlay">
-        <div class="modal">
-            <h3 id="taskModalTitle">添加任务</h3>
-            <input type="hidden" id="taskId">
+        <div class="modal"><h3 id="taskModalTitle">添加任务</h3><input type="hidden" id="taskId">
             <div class="form-group"><label>任务名称</label><input type="text" id="taskName"></div>
-            <div class="form-group"><label>任务类型</label><select id="taskType"><option value="daily">日常</option><option value="main">主线</option><option value="side">支线</option></select></div>
+            <div class="form-group"><label>类型</label><select id="taskType"><option value="daily">日常</option><option value="main">主线</option><option value="side">支线</option></select></div>
             <div class="form-group"><label>消耗 HP</label><input type="text" id="taskHp" value="10"></div>
             <div class="form-group"><label>获得 金币</label><input type="text" id="taskGold" value="20"></div>
             <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('taskModal')">取消</button><button class="btn-save" onclick="saveTask()">保存</button></div>
@@ -360,101 +347,78 @@
     </div>
 
     <div id="goalModal" class="modal-overlay">
-        <div class="modal">
-            <h3>添加自定义长线目标</h3>
-            <div class="form-group"><label>目标名称 (如: 存款计划 / 减重打卡)</label><input type="text" id="goalName" placeholder="例如: 减脂率目标"></div>
-            <div class="form-group"><label>指标类型</label>
-                <select id="goalType">
-                    <option value="forward">正向增长型 (存款、肌肉量：数字越大越好)</option>
-                    <option value="backward">反向减少型 (体重、体脂率：数字越小越好)</option>
-                </select>
-            </div>
-            <div class="form-group"><label>起始值 (例如: 55)</label><input type="text" id="goalStart" value="0"></div>
-            <div class="form-group"><label>当前值 (例如: 55)</label><input type="text" id="goalCurrent" value="0"></div>
-            <div class="form-group"><label>目标值 (例如: 48)</label><input type="text" id="goalTarget" value="100"></div>
-            <div class="form-group"><label>换算规则描述 (如: 每降 0.1kg 奖励 15G)</label><input type="text" id="goalRule" placeholder="例如: 每推进 1 单位奖励 20 金币"></div>
-            <div class="form-group"><label>每推进 1 单位奖励的金币数 (G)</label><input type="text" id="goalRate" value="20"></div>
-            <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('goalModal')">取消</button><button class="btn-save" onclick="saveGoal()">创建目标</button></div>
+        <div class="modal"><h3>添加自定义长线目标</h3>
+            <div class="form-group"><label>目标名称</label><input type="text" id="goalName" placeholder="例如: 存款计划"></div>
+            <div class="form-group"><label>指标类型</label><select id="goalType"><option value="forward">正向增长型 (数字越大越好)</option><option value="backward">反向减少型 (数字越小越好)</option></select></div>
+            <div class="form-group"><label>起始值</label><input type="text" id="goalStart" value="0"></div>
+            <div class="form-group"><label>当前值</label><input type="text" id="goalCurrent" value="0"></div>
+            <div class="form-group"><label>目标值</label><input type="text" id="goalTarget" value="100"></div>
+            <div class="form-group"><label>规则描述</label><input type="text" id="goalRule" placeholder="例如: 每推进 1 单位奖励 20G"></div>
+            <div class="form-group"><label>奖励倍率 (G/单位)</label><input type="text" id="goalRate" value="20"></div>
+            <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('goalModal')">取消</button><button class="btn-save" onclick="saveGoal()">创建</button></div>
         </div>
     </div>
 
     <div id="rewardModal" class="modal-overlay">
-        <div class="modal">
-            <h3 id="rewardModalTitle">添加奖励</h3>
-            <input type="hidden" id="rewardId">
-            <div class="form-group"><label>奖励名称</label><input type="text" id="rewardName"></div>
-            <div class="form-group"><label>需要金币</label><input type="text" id="rewardGold" value="500"></div>
+        <div class="modal"><h3 id="rewardModalTitle">添加奖励</h3><input type="hidden" id="rewardId">
+            <div class="form-group"><label>名称</label><input type="text" id="rewardName"></div>
+            <div class="form-group"><label>价格(G)</label><input type="text" id="rewardGold" value="500"></div>
             <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('rewardModal')">取消</button><button class="btn-save" onclick="saveReward()">保存</button></div>
         </div>
     </div>
 
     <div id="achiModal" class="modal-overlay">
-        <div class="modal">
-            <h3 id="achiModalTitle">挂上新目标</h3>
-            <div class="form-group"><label>徽章名称 (如: 破风者)</label><input type="text" id="achiName"></div>
-            <div class="form-group"><label>达成条件 (如: 10km跑进1小时)</label><input type="text" id="achiDesc"></div>
-            <div class="form-group"><label>达成奖励金币</label><input type="text" id="achiReward" value="1000"></div>
+        <div class="modal"><h3 id="achiModalTitle">挂上新目标</h3>
+            <div class="form-group"><label>徽章名称</label><input type="text" id="achiName"></div>
+            <div class="form-group"><label>达成条件</label><input type="text" id="achiDesc"></div>
+            <div class="form-group"><label>奖励金币</label><input type="text" id="achiReward" value="1000"></div>
             <div class="modal-btns"><button class="btn-cancel" onclick="closeModal('achiModal')">取消</button><button class="btn-save" onclick="saveAchi()">贴上墙</button></div>
         </div>
     </div>
 
     <script>
-        // --- 1. 数据无损迁移与初始化 (完美保留你的所有数据) ---
+        // --- 1. 数据无损迁移 V11 ---
         let defaultState = {
             hp: 100, gold: 0, 
-            goals: [
-                { id: "g1", name: "🎯 主线: RM 150K 存款计划", type: "forward", start: 0, current: 0, target: 150000, rate: 0.1, rule: "每存入 10 RM 奖励 1G" }
-            ],
+            goals: [{ id: "g1", name: "🎯 主线: RM 150K 存款计划", type: "forward", start: 0, current: 0, target: 150000, rate: 0.1, rule: "每存入 10 RM 奖励 1G" }],
             lastLoginDate: new Date().toLocaleDateString('en-CA'),
             tasks: [
                 { id: Date.now()+1, text: "记账", type: "daily", hpCost: 5, goldReward: 10, done: false },
                 { id: Date.now()+2, text: "敷面膜", type: "daily", hpCost: 5, goldReward: 10, done: false },
                 { id: Date.now()+3, text: "备菜/准备便当", type: "daily", hpCost: 15, goldReward: 20, done: false },
                 { id: Date.now()+4, text: "运动打卡", type: "daily", hpCost: 25, goldReward: 50, done: false },
-                { id: Date.now()+6, text: "10月旅行准备", type: "main", hpCost: 10, goldReward: 100, done: false },
-                { id: Date.now()+8, text: "周更Vlog素材", type: "side", hpCost: 20, goldReward: 80, done: false }
+                { id: Date.now()+6, text: "10月旅行准备", type: "main", hpCost: 10, goldReward: 100, done: false }
             ],
             shop: [
                 { id: Date.now()+10, text: "今日免做便当卡 🍱", cost: 100 },
                 { id: Date.now()+11, text: "连刷三集霸总短剧 📺", cost: 500 },
-                { id: Date.now()+12, text: "豪华烤鸡排放纵餐 🍗", cost: 800 },
                 { id: Date.now()+13, text: "买新首饰/安踏装备 🛍️", cost: 3000 }
             ],
             achievements: [
                 { id: "a1", name: "破风者", desc: "单次配速 7'30\" 跑完 10km", reward: 1000, claimed: false, icon: "🏃‍♀️" },
-                { id: "a2", name: "钢铁意志", desc: "完成 60 分钟以上力量训练", reward: 800, claimed: false, icon: "🏋️‍♀️" },
-                { id: "a3", name: "数据清道夫", desc: "高效无拖延交付信贷报告", reward: 300, claimed: false, icon: "📊" },
-                { id: "a4", name: "第一桶金", desc: "存款或减重取得阶段性大捷", reward: 1000, claimed: false, icon: "💰" }
+                { id: "a2", name: "钢铁意志", desc: "完成 60 分钟以上力量训练", reward: 800, claimed: false, icon: "🏋️‍♀️" }
             ],
-            history: {} 
+            history: {}, cloud: { token: '', gistId: '' } 
         };
 
-        // 从 V10 向下兼容读取 V9, V8, V7... 的数据，绝不覆盖
-        let state = JSON.parse(localStorage.getItem('lifeRpgState_v10'));
+        let state = JSON.parse(localStorage.getItem('lifeRpgState_v11'));
         if (!state) {
-            let oldState = JSON.parse(localStorage.getItem('lifeRpgState_v9') || localStorage.getItem('lifeRpgState_v8') || localStorage.getItem('lifeRpgState_v7') || localStorage.getItem('lifeRpgState_v6'));
+            let oldState = JSON.parse(localStorage.getItem('lifeRpgState_v10') || localStorage.getItem('lifeRpgState_v9') || localStorage.getItem('lifeRpgState_v8'));
             if (oldState) {
                 state = oldState;
-                if (oldState.savings && !oldState.goals) {
-                    state.goals = [
-                        { id: "g1", name: "🎯 主线: RM 150K 存款计划", type: "forward", start: 0, current: oldState.savings.current || 0, target: oldState.savings.target || 150000, rate: 0.1, rule: "每存入 10 RM 奖励 1G" }
-                    ];
+                if (!state.cloud) state.cloud = { token: '', gistId: '' };
+                if (state.savings && !state.goals) {
+                    state.goals = [{ id: "g1", name: "🎯 主线: RM 150K 存款计划", type: "forward", start: 0, current: state.savings.current || 0, target: state.savings.target || 150000, rate: 0.1, rule: "每存入 10 RM 奖励 1G" }];
                     delete state.savings;
-                } else if (!state.goals) {
-                    state.goals = defaultState.goals;
-                }
-            } else {
-                state = defaultState;
-            }
+                } else if (!state.goals) state.goals = defaultState.goals;
+            } else state = defaultState;
         }
-        
+
         let currentDate = new Date(); 
         let displayYear = currentDate.getFullYear();
         let displayMonth = currentDate.getMonth(); 
         let selectedDateStr = null;
-
-        function getTodayStr() { return new Date().toLocaleDateString('en-CA'); }
-        let todayStr = getTodayStr();
+        let todayStr = new Date().toLocaleDateString('en-CA');
 
         if (state.lastLoginDate !== todayStr) {
             state.hp = 100;
@@ -465,66 +429,98 @@
 
         function updateTodayHistory() {
             let logs = [];
-            state.tasks.forEach(t => {
-                if (t.done) {
-                    let sign = t.goldReward > 0 ? '+' : '';
-                    logs.push(`${t.text} (${sign}${t.goldReward}G)`);
-                }
-            });
+            state.tasks.forEach(t => { if (t.done) logs.push(`${t.text} (+${t.goldReward}G)`); });
             let existingLogs = (state.history[todayStr] && state.history[todayStr].logs) ? state.history[todayStr].logs : [];
             let specialLogs = existingLogs.filter(l => l.startsWith("目标:") || l.startsWith("盲盒:") || l.startsWith("🏅") || l.startsWith("🐕"));
             let finalLogs = [...new Set([...logs, ...specialLogs])];
-
-            if (finalLogs.length > 0 || state.gold > 0) {
-                state.history[todayStr] = { gold: state.gold, logs: finalLogs };
-            }
+            if (finalLogs.length > 0 || state.gold > 0) state.history[todayStr] = { gold: state.gold, logs: finalLogs };
         }
 
         function saveData() {
             updateTodayHistory(); 
-            localStorage.setItem('lifeRpgState_v10', JSON.stringify(state));
+            localStorage.setItem('lifeRpgState_v11', JSON.stringify(state));
             render();
             if(document.getElementById('history-tab').classList.contains('active')) {
-                renderCalendar();
-                if(selectedDateStr) showDateDetail(selectedDateStr);
+                renderCalendar(); if(selectedDateStr) showDateDetail(selectedDateStr);
             }
         }
 
-        // --- 🐕 柴犬按钮互动与投喂逻辑 ---
-        
-        // 点击页面空白处关闭浮窗
-        window.addEventListener('click', () => {
-            document.querySelectorAll('.feed-menu').forEach(m => m.classList.remove('active'));
-        });
+        // --- ☁️ GitHub Gist 云端同步核心逻辑 ---
+        async function uploadToCloud() {
+            const token = document.getElementById('githubToken').value.trim();
+            let gistId = document.getElementById('gistId').value.trim();
+            if(!token) return alert("❌ 请先输入 GitHub 密钥 (PAT)！");
+
+            // 保存设置到本地
+            state.cloud = { token, gistId };
+            saveData(); 
+            const dataStr = JSON.stringify(state);
+            const body = { description: "Ys Life RPG Save Data", public: false, files: { "ys_rpg_save.json": { content: dataStr } } };
+
+            try {
+                if(gistId) {
+                    let res = await fetch(`https://api.github.com/gists/${gistId}`, { method: 'PATCH', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }, body: JSON.stringify(body) });
+                    if(res.ok) alert("🎉 成功同步到云端！");
+                    else alert("同步失败，请检查密钥或 Gist ID 是否正确。");
+                } else {
+                    let res = await fetch(`https://api.github.com/gists`, { method: 'POST', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }, body: JSON.stringify(body) });
+                    if(res.ok) {
+                        let json = await res.json();
+                        document.getElementById('gistId').value = json.id;
+                        state.cloud.gistId = json.id; saveData();
+                        alert("🎉 首次云端存档创建成功！请务必复制保存好你的 Gist ID！");
+                    } else alert("创建失败，请确保密钥勾选了 [gist] 权限。");
+                }
+            } catch(e) { alert("网络错误！"); }
+        }
+
+        async function downloadFromCloud() {
+            const token = document.getElementById('githubToken').value.trim();
+            let gistId = document.getElementById('gistId').value.trim();
+            if(!gistId) return alert("❌ 请输入 Gist ID 以便下载存档！");
+
+            try {
+                let headers = { 'Accept': 'application/vnd.github.v3+json' };
+                if(token) headers['Authorization'] = `token ${token}`; // token is optional for reading if public, but required if private
+                let res = await fetch(`https://api.github.com/gists/${gistId}`, { headers });
+                
+                if(res.ok) {
+                    let json = await res.json();
+                    let content = json.files["ys_rpg_save.json"].content;
+                    if(content) {
+                        let parsed = JSON.parse(content);
+                        if(confirm("⚠️ 警告：下载云端数据将覆盖当前本地所有进度。是否继续？")) {
+                            state = parsed;
+                            state.cloud = { token, gistId }; // 更新当前面板
+                            saveData();
+                            alert("✅ 数据恢复成功！欢迎回来！");
+                        }
+                    }
+                } else alert("下载失败，未找到该存档，请检查 Gist ID 或密钥。");
+            } catch(e) { alert("网络错误！"); }
+        }
+
+
+        // --- 🐕 柴犬按钮互动逻辑 ---
+        window.addEventListener('click', () => { document.querySelectorAll('.feed-menu').forEach(m => m.classList.remove('active')); });
 
         function toggleFeedMenu(petKey, event) {
-            event.stopPropagation(); // 阻止冒泡，避免立刻被 window 监听器关闭
-            // 关闭所有菜单，只保留当前点击的
-            document.querySelectorAll('.feed-menu').forEach(m => {
-                if(m.id !== 'menu-' + petKey) m.classList.remove('active');
-            });
-            let menu = document.getElementById('menu-' + petKey);
-            menu.classList.toggle('active');
+            event.stopPropagation(); 
+            document.querySelectorAll('.feed-menu').forEach(m => { if(m.id !== 'menu-' + petKey) m.classList.remove('active'); });
+            document.getElementById('menu-' + petKey).classList.toggle('active');
         }
 
         function showBubbleByPetKey(petKey, textHtml) {
             let bubble = document.getElementById('bubble-' + petKey);
             if (!bubble) return;
             bubble.innerHTML = textHtml;
-            bubble.style.opacity = '1';
-            // 向下弹出
-            bubble.style.transform = 'translateY(0) translateX(-50%)';
-
+            bubble.style.opacity = '1'; bubble.style.transform = 'translateY(0) translateX(-50%)';
             if (bubble.timeoutId) clearTimeout(bubble.timeoutId);
-            bubble.timeoutId = setTimeout(() => {
-                bubble.style.opacity = '0';
-                bubble.style.transform = 'translateY(10px) translateX(-50%)';
-            }, 3000);
+            bubble.timeoutId = setTimeout(() => { bubble.style.opacity = '0'; bubble.style.transform = 'translateY(10px) translateX(-50%)'; }, 3000);
         }
 
-        // 核心喂养功能 (带概率随机金币)
         function feedPet(name, actionType, event) {
-            event.stopPropagation(); // 阻止冒泡
+            event.stopPropagation();
             let petKey = (name === '快快') ? 'kuaikuai' : 'mini';
             document.getElementById('menu-' + petKey).classList.remove('active');
 
@@ -537,454 +533,213 @@
 
             let act = actions[actionType];
             state.hp = Math.min(100, state.hp + act.hp);
-
-            // 75% 极高概率爆金币
             let gotGold = 0;
-            if (Math.random() < 0.75) {
-                gotGold = Math.floor(Math.random() * (act.goldMax - act.goldMin + 1)) + act.goldMin;
-                state.gold += gotGold;
-            }
+            if (Math.random() < 0.75) { gotGold = Math.floor(Math.random() * (act.goldMax - act.goldMin + 1)) + act.goldMin; state.gold += gotGold; }
 
             let effectHtml = `<b style="color:var(--green)">+${act.hp} HP</b>`;
-            let effectText = `+${act.hp} HP`;
-            if (gotGold > 0) {
-                effectHtml += ` / <b style="color:var(--gold)">+${gotGold} G 💰</b>`;
-                effectText += ` / +${gotGold}G`;
-            }
-
-            let logMsg = `🐕 ${name} (${act.name}): ${effectText}`;
+            if (gotGold > 0) effectHtml += ` / <b style="color:var(--gold)">+${gotGold} G 💰</b>`;
+            
             if(!state.history[todayStr]) state.history[todayStr] = { gold: state.gold, logs: [] };
-            state.history[todayStr].logs.push(logMsg);
+            state.history[todayStr].logs.push(`🐕 ${name} (${act.name}): +${act.hp}HP ${gotGold>0?'+'+gotGold+'G':''}`);
 
             showBubbleByPetKey(petKey, `${act.msg}<br>${effectHtml}`);
             saveData();
         }
 
-        // --- 盲盒抽卡 ---
+        // --- 盲盒 ---
         function playGacha() {
-            if (state.gold < 150) return alert("金币不足 150G！快去清日常赚金币！");
-            if (!confirm("确认花费 150G 抽取盲盒吗？考验血统的时刻到了！")) return;
-
-            state.gold -= 150;
-            let r = Math.random(); 
-            let resultText = "", logText = "";
-
-            if (r < 0.15) {
-                state.gold += 500;
-                resultText = "🎉【隐藏款】欧皇附体！直接暴击 500 G 现金红包！";
-                logText = "盲盒: 欧皇附体赚了 500G！";
-            } else if (r < 0.70) {
-                state.hp = Math.min(100, state.hp + 30);
-                resultText = "🎁【普通款】抽中了一杯外星人电解质水！恢复 30 HP！";
-                logText = "盲盒: 喝了电解质水 (+30 HP)";
-            } else {
-                state.hp = Math.max(0, state.hp - 10);
-                resultText = "🌩️【谢谢参与】非酋时刻...被吞了 150G，气得扣了 10 HP！";
-                logText = "盲盒: 啥都没抽到，气扣 10 HP";
-            }
+            if (state.gold < 150) return alert("金币不足 150G！");
+            if (!confirm("确认花费 150G 抽取盲盒吗？")) return;
+            state.gold -= 150; let r = Math.random(), log = "", res = "";
+            if (r < 0.15) { state.gold += 500; res = "🎉 欧皇附体！直接暴击 500 G 现金红包！"; log = "盲盒: 欧皇附体赚了 500G！"; } 
+            else if (r < 0.70) { state.hp = Math.min(100, state.hp + 30); res = "🎁 抽中电解质水！恢复 30 HP！"; log = "盲盒: 喝水 (+30 HP)"; } 
+            else { state.hp = Math.max(0, state.hp - 10); res = "🌩️ 非酋时刻...气得扣了 10 HP！"; log = "盲盒: 啥都没抽到，气扣 10 HP"; }
             
             if(!state.history[todayStr]) state.history[todayStr] = { gold: state.gold, logs: [] };
-            state.history[todayStr].logs.push(logText);
-            
-            alert(resultText);
-            saveData();
+            state.history[todayStr].logs.push(log);
+            alert(res); saveData();
         }
 
-        // --- 渲染 UI ---
+        // --- 渲染 UI (省略部分重复的DOM操作，重点更新云端表单) ---
         function render() {
             document.getElementById('hpDisplay').innerText = `HP: ${state.hp}/100 ❤️`;
             document.getElementById('goldDisplay').innerText = `金币: ${state.gold} 💰`;
+            
+            if(state.cloud) {
+                document.getElementById('githubToken').value = state.cloud.token || '';
+                document.getElementById('gistId').value = state.cloud.gistId || '';
+            }
 
             const goalsContainer = document.getElementById('goalsContainer');
             goalsContainer.innerHTML = '';
-            if(!state.goals || state.goals.length === 0) {
-                goalsContainer.innerHTML = '<div class="card" style="text-align:center;color:#999;">暂无长线目标，点击下方按钮添加！</div>';
-            } else {
+            if(!state.goals || state.goals.length === 0) { goalsContainer.innerHTML = '<div class="card" style="text-align:center;color:#999;">暂无长线目标，点击下方按钮添加！</div>'; } 
+            else {
                 state.goals.forEach(g => {
-                    let totalDiff = Math.abs(g.target - g.start);
-                    let progressDiff = g.type === 'forward' ? (g.current - g.start) : (g.start - g.current);
-                    let percent = totalDiff === 0 ? 100 : Math.max(0, Math.min(100, (progressDiff / totalDiff) * 100));
-
+                    let tDiff = Math.abs(g.target - g.start), pDiff = g.type === 'forward' ? (g.current - g.start) : (g.start - g.current);
+                    let pct = tDiff === 0 ? 100 : Math.max(0, Math.min(100, (pDiff / tDiff) * 100));
                     goalsContainer.innerHTML += `
                         <div class="goal-card">
-                            <div class="goal-header">
-                                <span>${g.name}</span>
-                                <span>当前: ${g.current} / 目标: ${g.target}</span>
-                            </div>
-                            <div class="goal-sub">${g.rule || '按单位换算金币'} | 进度: ${percent.toFixed(1)}%</div>
-                            <div class="progress-container">
-                                <div class="progress-bar" style="width: ${percent}%; background: var(--accent);"></div>
-                            </div>
+                            <div class="goal-header"><span>${g.name}</span><span>${g.current} / ${g.target}</span></div>
+                            <div class="goal-sub">${g.rule || '按单位换算金币'} | 进度: ${pct.toFixed(1)}%</div>
+                            <div class="progress-container"><div class="progress-bar" style="width: ${pct}%;"></div></div>
                             <div class="goal-input-row">
-                                <input type="text" id="goal_input_${g.id}" placeholder="输入推进数值 (如: 200 或 0.5)">
-                                <button onclick="updateGoal('${g.id}')">更新进展</button>
+                                <input type="text" id="goal_input_${g.id}" placeholder="输入推进数值">
+                                <button onclick="updateGoal('${g.id}')">更新</button>
                                 <button onclick="deleteGoal('${g.id}')" style="background:var(--red);padding:8px 10px;">🗑️</button>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
             }
 
             const renderTaskList = (type, containerId) => {
-                const container = document.getElementById(containerId);
-                container.innerHTML = '';
+                const container = document.getElementById(containerId); container.innerHTML = '';
                 let tasks = state.tasks.filter(t => t.type === type);
                 if(tasks.length === 0) container.innerHTML = '<div style="color:#ccc; font-size:0.9em;">暂无任务</div>';
-                
                 tasks.forEach(task => {
-                    let hpText = task.hpCost < 0 ? `+${Math.abs(task.hpCost)}HP` : `-${task.hpCost}HP`;
-                    let goldText = task.goldReward > 0 ? ` / +${task.goldReward}G` : '';
-                    let nameClass = task.done ? 'item-name done' : 'item-name';
-                    
+                    let hpt = task.hpCost < 0 ? `+${Math.abs(task.hpCost)}HP` : `-${task.hpCost}HP`, gt = task.goldReward > 0 ? ` / +${task.goldReward}G` : '';
                     container.innerHTML += `
                         <div class="item-row">
                             <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})">
-                            <span class="${nameClass}">${task.text}</span>
-                            <div class="item-meta">
-                                <span>[${hpText}${goldText}]</span>
-                                <button class="btn-action" onclick="openTaskModal(${task.id})">✏️</button>
-                                <button class="btn-action" onclick="deleteTask(${task.id})">🗑️</button>
-                            </div>
-                        </div>
-                    `;
+                            <span class="item-name ${task.done ? 'done' : ''}">${task.text}</span>
+                            <div class="item-meta"><span>[${hpt}${gt}]</span><button class="btn-action" onclick="openTaskModal(${task.id})">✏️</button><button class="btn-action" onclick="deleteTask(${task.id})">🗑️</button></div>
+                        </div>`;
                 });
             };
-            renderTaskList('daily', 'dailyList');
-            renderTaskList('main', 'mainList');
-            renderTaskList('side', 'sideList');
+            renderTaskList('daily', 'dailyList'); renderTaskList('main', 'mainList'); renderTaskList('side', 'sideList');
 
-            const shopList = document.getElementById('shopList');
-            shopList.innerHTML = '';
+            const shopList = document.getElementById('shopList'); shopList.innerHTML = '';
             state.shop.forEach(item => {
-                shopList.innerHTML += `
-                    <div class="item-row">
-                        <span class="item-name">${item.text}</span>
-                        <div class="item-meta">
-                            <button class="btn-buy" onclick="buyReward(${item.id})" ${state.gold < item.cost ? 'disabled' : ''}>${item.cost} G</button>
-                            <button class="btn-action" onclick="deleteReward(${item.id})">🗑️</button>
-                        </div>
-                    </div>
-                `;
+                shopList.innerHTML += `<div class="item-row"><span class="item-name">${item.text}</span><div class="item-meta"><button class="btn-buy" onclick="buyReward(${item.id})" ${state.gold < item.cost ? 'disabled' : ''}>${item.cost} G</button><button class="btn-action" onclick="deleteReward(${item.id})">🗑️</button></div></div>`;
             });
 
-            const achiList = document.getElementById('achiList');
-            achiList.innerHTML = '';
+            const achiList = document.getElementById('achiList'); achiList.innerHTML = '';
             state.achievements.forEach(a => {
-                let statusClass = a.claimed ? 'achi-item claimed' : 'achi-item';
-                let btnHtml = a.claimed 
-                    ? `<button class="btn-claim disabled">已点亮</button>` 
-                    : `<button class="btn-claim" onclick="claimAchi('${a.id}')">领取 ${a.reward}G</button>`;
-                
-                achiList.innerHTML += `
-                    <div class="${statusClass}">
-                        <div class="achi-icon">${a.icon}</div>
-                        <div class="achi-info">
-                            <div class="achi-name">${a.name}</div>
-                            <div class="achi-desc">${a.desc}</div>
-                        </div>
-                        <div>${btnHtml}</div>
-                    </div>
-                `;
+                let btnHtml = a.claimed ? `<button class="btn-claim disabled">已点亮</button>` : `<button class="btn-claim" onclick="claimAchi('${a.id}')">领取 ${a.reward}G</button>`;
+                achiList.innerHTML += `<div class="achi-item ${a.claimed ? 'claimed' : ''}"><div class="achi-icon">${a.icon}</div><div class="achi-info"><div class="achi-name">${a.name}</div><div class="achi-desc">${a.desc}</div></div><div>${btnHtml}</div></div>`;
             });
         }
 
-        // --- 业务逻辑 ---
+        // --- 业务操作 ---
         function toggleTask(id) {
             let task = state.tasks.find(t => t.id === id);
             if (!task.done) {
-                if (task.hpCost > 0 && state.hp - task.hpCost < 0) {
-                    alert("HP不足！去投喂快快和迷你赚点金币和体力吧！");
-                    render(); return;
-                }
-                state.hp = Math.min(100, state.hp - task.hpCost);
-                state.gold += task.goldReward;
-                task.done = true;
-            } else {
-                state.hp = Math.min(100, state.hp + task.hpCost);
-                state.gold -= task.goldReward;
-                task.done = false;
-            }
+                if (task.hpCost > 0 && state.hp - task.hpCost < 0) return alert("HP不足！去投喂萌宠恢复体力吧！");
+                state.hp = Math.min(100, state.hp - task.hpCost); state.gold += task.goldReward; task.done = true;
+            } else { state.hp = Math.min(100, state.hp + task.hpCost); state.gold -= task.goldReward; task.done = false; }
             saveData();
         }
 
         function updateGoal(goalId) {
-            let g = state.goals.find(x => x.id === goalId);
-            let inputVal = document.getElementById(`goal_input_${goalId}`).value.replace(/,/g, '');
-            let val = parseFloat(inputVal);
-            if(isNaN(val) || val <= 0) return alert("请输入有效的推进数值！");
-
-            let oldCurrent = g.current;
-            if (g.type === 'forward') {
-                g.current += val;
-            } else {
-                g.current -= val;
-            }
+            let g = state.goals.find(x => x.id === goalId), val = parseFloat(document.getElementById(`goal_input_${goalId}`).value.replace(/,/g, ''));
+            if(isNaN(val) || val <= 0) return alert("请输入有效的数值！");
+            if (g.type === 'forward') g.current += val; else g.current -= val;
             document.getElementById(`goal_input_${goalId}`).value = '';
-
-            let earnedGold = Math.round(val * (g.rate || 20));
-            state.gold += earnedGold;
-
+            let earned = Math.round(val * (g.rate || 20)); state.gold += earned;
             if(!state.history[todayStr]) state.history[todayStr] = { gold: state.gold, logs: [] };
-            state.history[todayStr].logs.push(`目标: [${g.name}] 推进了 ${val} (当前: ${g.current}) +${earnedGold}G`);
-
-            saveData();
-            alert(`目标更新成功！当前进度: ${g.current} / 目标: ${g.target}\n🎉 触发换算机制，奖励 ${earnedGold} 金币！`);
+            state.history[todayStr].logs.push(`目标: [${g.name}] 推进了 ${val} (+${earned}G)`);
+            saveData(); alert(`🎉 进度更新！奖励 ${earned} 金币！`);
         }
 
         function buyReward(id) {
-            let item = state.shop.find(i => i.id === id);
-            if (state.gold >= item.cost) {
-                if (confirm(`确认花费 ${item.cost}G 兑换【${item.text}】吗？`)) {
-                    state.gold -= item.cost;
-                    alert("兑换成功！好好享受吧！");
-                    saveData();
-                }
-            }
+            let i = state.shop.find(x => x.id === id);
+            if (state.gold >= i.cost && confirm(`确认兑换【${i.text}】吗？`)) { state.gold -= i.cost; saveData(); alert("兑换成功！"); }
         }
 
         function claimAchi(id) {
             let a = state.achievements.find(x => x.id === id);
-            if(a && !a.claimed) {
-                if(!confirm(`确认你已经达成【${a.name}】并领取 ${a.reward}G 吗？`)) return;
-                a.claimed = true;
-                state.gold += a.reward;
+            if(a && !a.claimed && confirm(`确认达成并领取 ${a.reward}G 吗？`)) { 
+                a.claimed = true; state.gold += a.reward; 
                 if(!state.history[todayStr]) state.history[todayStr] = { gold: state.gold, logs: [] };
                 state.history[todayStr].logs.push(`🏅 点亮成就: ${a.name} (+${a.reward}G)`);
-                alert(`恭喜达成成就【${a.name}】！奖励 ${a.reward}G 已入账！`);
-                saveData();
+                saveData(); alert(`🎉 奖励 ${a.reward}G 已入账！`); 
             }
         }
 
-        function deleteTask(id) { if(confirm("确定删除这个任务吗？")) { state.tasks = state.tasks.filter(t => t.id !== id); saveData(); } }
-        function deleteReward(id) { if(confirm("确定删除这个奖励吗？")) { state.shop = state.shop.filter(i => i.id !== id); saveData(); } }
-        function deleteGoal(id) { if(confirm("确定删除这个长线目标吗？")) { state.goals = state.goals.filter(g => g.id !== id); saveData(); } }
+        function deleteTask(id) { if(confirm("确定删除任务？")) { state.tasks = state.tasks.filter(t => t.id !== id); saveData(); } }
+        function deleteReward(id) { if(confirm("确定删除奖励？")) { state.shop = state.shop.filter(i => i.id !== id); saveData(); } }
+        function deleteGoal(id) { if(confirm("确定删除目标？")) { state.goals = state.goals.filter(g => g.id !== id); saveData(); } }
 
-        // --- 模态框逻辑 ---
+        // --- 弹窗逻辑 ---
         function openTaskModal(id = null) {
             document.getElementById('taskModal').style.display = 'flex';
             if (id) {
-                let task = state.tasks.find(t => t.id === id);
-                document.getElementById('taskModalTitle').innerText = "修改任务";
-                document.getElementById('taskId').value = task.id;
-                document.getElementById('taskName').value = task.text;
-                document.getElementById('taskType').value = task.type;
-                document.getElementById('taskHp').value = task.hpCost;
-                document.getElementById('taskGold').value = task.goldReward;
+                let t = state.tasks.find(x => x.id === id); document.getElementById('taskModalTitle').innerText = "修改";
+                document.getElementById('taskId').value = t.id; document.getElementById('taskName').value = t.text;
+                document.getElementById('taskType').value = t.type; document.getElementById('taskHp').value = t.hpCost; document.getElementById('taskGold').value = t.goldReward;
             } else {
-                document.getElementById('taskModalTitle').innerText = "添加新任务";
-                document.getElementById('taskId').value = "";
-                document.getElementById('taskName').value = "";
-                document.getElementById('taskHp').value = "10";
-                document.getElementById('taskGold').value = "20";
+                document.getElementById('taskModalTitle').innerText = "添加"; document.getElementById('taskId').value = ""; document.getElementById('taskName').value = "";
+                document.getElementById('taskHp').value = "10"; document.getElementById('taskGold').value = "20";
             }
         }
         function saveTask() {
-            let id = document.getElementById('taskId').value;
-            let name = document.getElementById('taskName').value.trim();
-            if(!name) return alert("任务名称不能为空！");
-            let parsedHp = parseInt(document.getElementById('taskHp').value, 10);
-            let parsedGold = parseInt(document.getElementById('taskGold').value, 10);
-            let newTask = {
-                id: id ? parseInt(id) : Date.now(),
-                text: name, type: document.getElementById('taskType').value,
-                hpCost: isNaN(parsedHp) ? 0 : parsedHp, goldReward: isNaN(parsedGold) ? 0 : parsedGold, done: false
-            };
-            if (id) {
-                let index = state.tasks.findIndex(t => t.id == id);
-                newTask.done = state.tasks[index].done; state.tasks[index] = newTask;
-            } else { state.tasks.push(newTask); }
+            let id = document.getElementById('taskId').value, name = document.getElementById('taskName').value.trim(); if(!name) return alert("名称不可为空！");
+            let t = { id: id ? parseInt(id) : Date.now(), text: name, type: document.getElementById('taskType').value, hpCost: parseInt(document.getElementById('taskHp').value)||0, goldReward: parseInt(document.getElementById('taskGold').value)||0, done: false };
+            if (id) { let i = state.tasks.findIndex(x => x.id == id); t.done = state.tasks[i].done; state.tasks[i] = t; } else state.tasks.push(t);
             closeModal('taskModal'); saveData();
         }
 
-        function openGoalModal() {
-            document.getElementById('goalModal').style.display = 'flex';
-            document.getElementById('goalName').value = "";
-            document.getElementById('goalStart').value = "0";
-            document.getElementById('goalCurrent').value = "0";
-            document.getElementById('goalTarget').value = "100";
-            document.getElementById('goalRule').value = "每推进 1 单位奖励 20 金币";
-            document.getElementById('goalRate').value = "20";
-        }
+        function openGoalModal() { document.getElementById('goalModal').style.display = 'flex'; document.getElementById('goalName').value = ""; document.getElementById('goalStart').value = "0"; document.getElementById('goalCurrent').value = "0"; document.getElementById('goalTarget').value = "100"; document.getElementById('goalRule').value = "每推进 1 单位奖励 20 金币"; document.getElementById('goalRate').value = "20"; }
         function saveGoal() {
-            let name = document.getElementById('goalName').value.trim();
-            if(!name) return alert("目标名称不能为空！");
-            let start = parseFloat(document.getElementById('goalStart').value) || 0;
-            let current = parseFloat(document.getElementById('goalCurrent').value) || 0;
-            let target = parseFloat(document.getElementById('goalTarget').value) || 100;
-            let rate = parseFloat(document.getElementById('goalRate').value) || 20;
-            let rule = document.getElementById('goalRule').value.trim();
-            let type = document.getElementById('goalType').value;
-
-            state.goals.push({
-                id: "goal_" + Date.now(),
-                name: name, type: type, start: start, current: current, target: target, rate: rate, rule: rule
-            });
+            let n = document.getElementById('goalName').value.trim(); if(!n) return alert("名称不可为空！");
+            state.goals.push({ id: "goal_" + Date.now(), name: n, type: document.getElementById('goalType').value, start: parseFloat(document.getElementById('goalStart').value)||0, current: parseFloat(document.getElementById('goalCurrent').value)||0, target: parseFloat(document.getElementById('goalTarget').value)||100, rate: parseFloat(document.getElementById('goalRate').value)||20, rule: document.getElementById('goalRule').value.trim() });
             closeModal('goalModal'); saveData();
         }
 
-        function openRewardModal() {
-            document.getElementById('rewardModal').style.display = 'flex';
-            document.getElementById('rewardName').value = "";
-            document.getElementById('rewardGold').value = "500";
-        }
-        function saveReward() {
-            let name = document.getElementById('rewardName').value.trim();
-            if(!name) return alert("名称不能为空！");
-            let parsedGold = parseInt(document.getElementById('rewardGold').value, 10);
-            state.shop.push({ id: Date.now(), text: name, cost: isNaN(parsedGold) ? 0 : parsedGold });
-            closeModal('rewardModal'); saveData();
-        }
+        function openRewardModal() { document.getElementById('rewardModal').style.display = 'flex'; document.getElementById('rewardName').value = ""; document.getElementById('rewardGold').value = "500"; }
+        function saveReward() { let n = document.getElementById('rewardName').value.trim(); if(!n) return; state.shop.push({ id: Date.now(), text: n, cost: parseInt(document.getElementById('rewardGold').value)||0 }); closeModal('rewardModal'); saveData(); }
 
-        function openAchiModal() {
-            document.getElementById('achiModal').style.display = 'flex';
-            document.getElementById('achiName').value = "";
-            document.getElementById('achiDesc').value = "";
-            document.getElementById('achiReward').value = "500";
-        }
-        function saveAchi() {
-            let name = document.getElementById('achiName').value.trim();
-            let desc = document.getElementById('achiDesc').value.trim();
-            if(!name) return alert("名称不能为空！");
-            let rwd = parseInt(document.getElementById('achiReward').value, 10);
-            state.achievements.push({
-                id: "a_" + Date.now(), name: name, desc: desc, reward: isNaN(rwd)?0:rwd, claimed: false, icon: "🌟"
-            });
-            closeModal('achiModal'); saveData();
-        }
+        function openAchiModal() { document.getElementById('achiModal').style.display = 'flex'; document.getElementById('achiName').value = ""; document.getElementById('achiDesc').value = ""; document.getElementById('achiReward').value = "500"; }
+        function saveAchi() { let n = document.getElementById('achiName').value.trim(); if(!n) return; state.achievements.push({ id: "a_"+Date.now(), name: n, desc: document.getElementById('achiDesc').value.trim(), reward: parseInt(document.getElementById('achiReward').value)||0, claimed: false, icon: "🌟" }); closeModal('achiModal'); saveData(); }
 
         function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
 
-        // --- 辅助工具 ---
+        // --- 杂项与日历 ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(`${tabId}-tab`).classList.add('active');
-            if(tabId === 'history') { renderCalendar(); }
+            event.target.classList.add('active'); document.getElementById(`${tabId}-tab`).classList.add('active');
+            if(tabId === 'history') renderCalendar();
         }
 
-        function updateTime() {
-            const now = new Date();
-            const options = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long', hour: '2-digit', minute:'2-digit', second:'2-digit' };
-            document.getElementById('timeDisplay').innerText = now.toLocaleString('zh-CN', options);
-        }
-        setInterval(updateTime, 1000); updateTime();
-
-        function getWeatherEmoji(code) {
-            if (code === 0) return '☀️'; 
-            if (code > 0 && code <= 3) return '⛅'; 
-            if (code >= 45 && code <= 48) return '🌫️'; 
-            if (code >= 51 && code <= 67) return '🌧️'; 
-            if (code >= 71 && code <= 77) return '❄️'; 
-            if (code >= 80 && code <= 82) return '🌦️'; 
-            if (code >= 95) return '⛈️'; 
-            return '☁️';
-        }
+        setInterval(() => { document.getElementById('timeDisplay').innerText = new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'long', hour: '2-digit', minute:'2-digit', second:'2-digit' }); }, 1000);
+        
         async function fetchWeather() {
             try {
-                const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=3.0333,3.1073,3.1390&longitude=101.4500,101.6067,101.6869&current_weather=true");
-                const data = await res.json();
-                document.getElementById('weatherDisplay').innerHTML = `
-                    ${getWeatherEmoji(data[0].current_weather.weathercode)} Klang ${data[0].current_weather.temperature}°C | 
-                    ${getWeatherEmoji(data[1].current_weather.weathercode)} PJ ${data[1].current_weather.temperature}°C | 
-                    ${getWeatherEmoji(data[2].current_weather.weathercode)} KL ${data[2].current_weather.temperature}°C
-                `;
+                let res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=3.033,3.139&longitude=101.45,101.68&current_weather=true");
+                let data = await res.json();
+                document.getElementById('weatherDisplay').innerHTML = `⛅ Klang ${data[0].current_weather.temperature}°C | ⛅ KL ${data[1].current_weather.temperature}°C`;
             } catch (e) { document.getElementById('weatherDisplay').innerText = "天气加载失败"; }
         }
         fetchWeather();
 
-        // --- 日历逻辑 ---
         function renderCalendar() {
             document.getElementById('calendarTitle').innerText = `${displayYear}年${displayMonth + 1}月 ▼`;
-            const daysContainer = document.getElementById('calendarDays');
-            daysContainer.innerHTML = '';
-            
-            let firstDay = new Date(displayYear, displayMonth, 1).getDay();
-            let daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
-            
+            const daysContainer = document.getElementById('calendarDays'); daysContainer.innerHTML = '';
+            let firstDay = new Date(displayYear, displayMonth, 1).getDay(), daysInMonth = new Date(displayYear, displayMonth + 1, 0).getDate();
             for (let i = 0; i < firstDay; i++) daysContainer.innerHTML += `<div class="calendar-day empty">0</div>`;
-            
-            let today = new Date();
             for (let i = 1; i <= daysInMonth; i++) {
-                let m = (displayMonth + 1).toString().padStart(2, '0');
-                let d = i.toString().padStart(2, '0');
-                let dateStr = `${displayYear}-${m}-${d}`;
-                
-                let classList = "calendar-day";
-                if (displayYear === today.getFullYear() && displayMonth === today.getMonth() && i === today.getDate()) classList += " today";
-                if (state.history[dateStr]) classList += " has-data";
-                if (dateStr === selectedDateStr) classList += " selected";
-                
-                daysContainer.innerHTML += `<div class="${classList}" onclick="selectDate('${dateStr}')">${i}</div>`;
+                let dStr = `${displayYear}-${(displayMonth+1).toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`;
+                let cls = "calendar-day" + (dStr===new Date().toLocaleDateString('en-CA')?" today":"") + (state.history[dStr]?" has-data":"") + (dStr===selectedDateStr?" selected":"");
+                daysContainer.innerHTML += `<div class="${cls}" onclick="selectDate('${dStr}')">${i}</div>`;
             }
         }
         
-        function changeMonth(delta) {
-            displayMonth += delta;
-            if (displayMonth < 0) { displayMonth = 11; displayYear--; } 
-            else if (displayMonth > 11) { displayMonth = 0; displayYear++; }
-            selectedDateStr = null;
-            document.getElementById('dailyDetail').classList.remove('active');
-            document.getElementById('calendarView').style.display = 'block';
-            document.getElementById('monthGrid').classList.remove('active');
-            renderCalendar();
-        }
-
-        function toggleMonthGrid() {
-            const grid = document.getElementById('monthGrid');
-            const view = document.getElementById('calendarView');
-            if (grid.classList.contains('active')) {
-                grid.classList.remove('active'); view.style.display = 'block';
-            } else {
-                grid.classList.add('active'); view.style.display = 'none'; renderMonthGrid();
-            }
-        }
-
-        function renderMonthGrid() {
-            const grid = document.getElementById('monthGrid');
-            grid.innerHTML = '';
-            const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
-            months.forEach((m, index) => {
-                let currentClass = (index === displayMonth) ? 'current-month' : '';
-                grid.innerHTML += `<div class="month-item ${currentClass}" onclick="selectMonth(${index})">${m}</div>`;
-            });
-        }
-
-        function selectMonth(mIndex) {
-            displayMonth = mIndex; toggleMonthGrid(); selectedDateStr = null;
-            document.getElementById('dailyDetail').classList.remove('active'); renderCalendar();
-        }
-
-        function selectDate(dateStr) {
-            selectedDateStr = dateStr; renderCalendar(); showDateDetail(dateStr);
-        }
-
+        function changeMonth(delta) { displayMonth += delta; if (displayMonth < 0) { displayMonth = 11; displayYear--; } else if (displayMonth > 11) { displayMonth = 0; displayYear++; } selectedDateStr = null; document.getElementById('dailyDetail').classList.remove('active'); document.getElementById('calendarView').style.display = 'block'; document.getElementById('monthGrid').classList.remove('active'); renderCalendar(); }
+        function toggleMonthGrid() { const grid = document.getElementById('monthGrid'), view = document.getElementById('calendarView'); if (grid.classList.contains('active')) { grid.classList.remove('active'); view.style.display = 'block'; } else { grid.classList.add('active'); view.style.display = 'none'; renderMonthGrid(); } }
+        function renderMonthGrid() { const grid = document.getElementById('monthGrid'); grid.innerHTML = ''; ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'].forEach((m, i) => { grid.innerHTML += `<div class="month-item ${i===displayMonth?'current-month':''}" onclick="selectMonth(${i})">${m}</div>`; }); }
+        function selectMonth(mIndex) { displayMonth = mIndex; toggleMonthGrid(); selectedDateStr = null; document.getElementById('dailyDetail').classList.remove('active'); renderCalendar(); }
+        function selectDate(dateStr) { selectedDateStr = dateStr; renderCalendar(); showDateDetail(dateStr); }
         function showDateDetail(dateStr) {
-            const detailView = document.getElementById('dailyDetail');
-            detailView.classList.add('active');
+            const detailView = document.getElementById('dailyDetail'); detailView.classList.add('active');
             document.getElementById('detailDate').innerText = `${dateStr} 记录`;
-            
             const record = state.history[dateStr];
-            const goldText = document.getElementById('detailGoldText');
-            const goldBar = document.getElementById('detailGoldBar');
-            const logsContainer = document.getElementById('detailLogs');
-            
             if (record) {
-                let gold = record.gold;
-                let percent = Math.min(100, (gold / 5000) * 100);
-                goldText.innerText = `${gold} G`;
-                goldBar.style.width = '0%';
-                setTimeout(() => { goldBar.style.width = `${percent}%`; }, 50);
-
-                if (record.logs && record.logs.length > 0) {
-                    logsContainer.innerHTML = record.logs.map(log => `<div class="history-item">${log}</div>`).join('');
-                } else { logsContainer.innerHTML = '<div style="color:#999; font-size:0.9em; padding-left:10px;">有记录，但未写入具体任务。</div>'; }
-            } else {
-                goldText.innerText = `0 G`; goldBar.style.width = '0%';
-                logsContainer.innerHTML = '<div style="color:#999; font-size:0.9em; padding-left:10px;">今天没有记录哦。</div>';
-            }
+                let pct = Math.min(100, (record.gold / 5000) * 100);
+                document.getElementById('detailGoldText').innerText = `${record.gold} G`;
+                document.getElementById('detailGoldBar').style.width = '0%'; setTimeout(() => { document.getElementById('detailGoldBar').style.width = `${pct}%`; }, 50);
+                document.getElementById('detailLogs').innerHTML = (record.logs && record.logs.length>0) ? record.logs.map(log => `<div class="history-item">${log}</div>`).join('') : '<div style="color:#999;font-size:0.9em;">无具体任务记录。</div>';
+            } else { document.getElementById('detailGoldText').innerText = `0 G`; document.getElementById('detailGoldBar').style.width = '0%'; document.getElementById('detailLogs').innerHTML = '<div style="color:#999;font-size:0.9em;">今日无记录。</div>'; }
         }
-
         render();
     </script>
 </body>

@@ -3,17 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>人生手账 V7</title>
+    <title>人生手账 V8</title>
     <style>
         :root { --bg: #faf7f2; --text: #5c4d43; --accent: #e2b49a; --accent-hover: #d1a086; --box: #ffffff; --green: #a8c3a6; --red: #e09f9f; --gold: #ffd700; }
         body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); padding: 15px; max-width: 600px; margin: 0 auto; line-height: 1.5; }
         
         /* Shiba Pet Area */
-        .shiba-house { display: flex; justify-content: center; gap: 30px; margin-bottom: 15px; padding: 15px; background: #fffaf0; border: 2px dashed var(--accent); border-radius: 15px; }
-        .shiba-pet { text-align: center; cursor: pointer; transition: transform 0.2s; user-select: none; }
-        .shiba-pet:active { transform: scale(0.9); }
-        .shiba-icon { font-size: 2.5em; margin-bottom: 5px; }
-        .shiba-name { font-weight: bold; font-size: 0.9em; color: var(--accent); }
+        .shiba-house { display: flex; justify-content: center; gap: 40px; margin-bottom: 15px; padding: 25px 15px 15px 15px; background: #fffaf0; border: 2px dashed var(--accent); border-radius: 15px; }
+        .shiba-pet { position: relative; text-align: center; cursor: pointer; user-select: none; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .shiba-pet:active { transform: scale(0.9) translateY(5px); }
+        .shiba-icon { width: 70px; height: 70px; margin: 0 auto 5px; }
+        .shiba-name { font-weight: bold; font-size: 0.9em; color: var(--accent); background: #fff; padding: 2px 10px; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 2px 4px rgba(226,180,154,0.2);}
+        
+        /* Speech Bubble */
+        .speech-bubble {
+            position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%) translateY(10px);
+            background: rgba(255, 255, 255, 0.95); border: 2px solid var(--accent);
+            padding: 8px 12px; border-radius: 12px; font-size: 0.8em; color: var(--text);
+            width: max-content; max-width: 140px; opacity: 0; pointer-events: none;
+            transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; line-height: 1.4;
+        }
+        .speech-bubble::after {
+            content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px;
+            border-width: 6px; border-style: solid; border-color: var(--accent) transparent transparent transparent;
+        }
 
         /* Top Info Bar */
         .info-bar { background: var(--box); padding: 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 15px; font-size: 0.9em; }
@@ -32,7 +45,7 @@
         .card { background: var(--box); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 10px; border-bottom: 2px dashed #eee; padding-bottom: 5px; color: var(--accent); display: flex; justify-content: space-between; align-items: center;}
         
-        /* 独立存款仪表盘 */
+        /* Savings Widget */
         .savings-widget { background: #fdf5f1; border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--accent); }
         .savings-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--accent); margin-bottom: 10px; font-size: 1.05em;}
         .savings-input-row { display: flex; gap: 8px; margin-top: 15px; }
@@ -81,11 +94,10 @@
         .btn-save { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer;}
         .btn-cancel { background: #eee; color: #666; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer;}
 
-        /* Hide content */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        /* Calendar Styles (Condensed) */
+        /* Calendar Styles */
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .calendar-header button { background: none; border: none; font-size: 1.2em; color: var(--accent); cursor: pointer; font-weight: bold; padding: 5px 10px;}
         .calendar-title { font-weight: bold; font-size: 1.1em; cursor: pointer; padding: 5px 10px; border-radius: 6px; }
@@ -102,24 +114,66 @@
         .month-grid.active { display: grid; }
         .month-item { padding: 15px; background: #eee; border-radius: 8px; cursor: pointer; font-weight: bold; }
         
-        /* Progress Bar */
         .progress-container { width: 100%; background: #eee; border-radius: 10px; height: 16px; margin: 10px 0; overflow: hidden; position: relative;}
         .progress-bar { height: 100%; background: var(--green); border-radius: 10px; transition: width 0.4s ease-out; }
         .progress-text { position: absolute; width: 100%; text-align: center; top: 0; left: 0; font-size: 0.75em; line-height: 16px; color: #333; font-weight: bold;}
-        
         .history-item { margin-bottom: 8px; font-size: 0.9em; padding-left: 10px; border-left: 3px solid var(--accent); }
     </style>
 </head>
 <body>
 
-    <!-- 🐕 Shiba Pet Area -->
+    <!-- 🐕 Shiba Pet Area with Hand-drawn SVG -->
     <div class="shiba-house">
-        <div class="shiba-pet" onclick="petShiba('快快')">
-            <div class="shiba-icon">🐕</div>
+        <div class="shiba-pet" onclick="petShiba('快快', this)">
+            <div class="shiba-icon">
+                <svg viewBox="0 0 100 100" width="100%" height="100%">
+                    <!-- Ears -->
+                    <polygon points="15,25 40,40 25,55" fill="#e89f53" />
+                    <polygon points="85,25 60,40 75,55" fill="#e89f53" />
+                    <!-- Head Base -->
+                    <circle cx="50" cy="55" r="35" fill="#e89f53" />
+                    <!-- White Cheeks/Snout -->
+                    <path d="M20,60 Q50,95 80,60 Q80,45 50,50 Q20,45 20,60" fill="#ffffff" />
+                    <!-- Eyebrows -->
+                    <circle cx="35" cy="40" r="4" fill="#ffffff" />
+                    <circle cx="65" cy="40" r="4" fill="#ffffff" />
+                    <!-- Eyes -->
+                    <circle cx="35" cy="50" r="3.5" fill="#333333" />
+                    <circle cx="65" cy="50" r="3.5" fill="#333333" />
+                    <!-- Nose & Mouth -->
+                    <circle cx="50" cy="58" r="4" fill="#333333" />
+                    <path d="M42,65 Q50,72 58,65" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" />
+                    <!-- Collar (Blue for 快快) -->
+                    <path d="M22,78 Q50,92 78,78 L72,85 Q50,98 28,85 Z" fill="#3b82f6" />
+                </svg>
+            </div>
             <div class="shiba-name">快快</div>
         </div>
-        <div class="shiba-pet" onclick="petShiba('迷你')">
-            <div class="shiba-icon">🐕</div>
+        
+        <div class="shiba-pet" onclick="petShiba('迷你', this)">
+            <div class="shiba-icon">
+                <svg viewBox="0 0 100 100" width="100%" height="100%">
+                    <!-- Ears -->
+                    <polygon points="15,25 40,40 25,55" fill="#d98c41" />
+                    <polygon points="85,25 60,40 75,55" fill="#d98c41" />
+                    <!-- Head Base -->
+                    <circle cx="50" cy="55" r="35" fill="#d98c41" />
+                    <!-- White Cheeks/Snout -->
+                    <path d="M20,60 Q50,95 80,60 Q80,45 50,50 Q20,45 20,60" fill="#ffffff" />
+                    <!-- Eyebrows -->
+                    <circle cx="35" cy="40" r="4" fill="#ffffff" />
+                    <circle cx="65" cy="40" r="4" fill="#ffffff" />
+                    <!-- Eyes -->
+                    <circle cx="35" cy="50" r="3.5" fill="#333333" />
+                    <circle cx="65" cy="50" r="3.5" fill="#333333" />
+                    <!-- Nose & Mouth -->
+                    <circle cx="50" cy="58" r="4" fill="#333333" />
+                    <path d="M42,65 Q50,72 58,65" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" />
+                    <!-- Collar (Red with bell for 迷你) -->
+                    <path d="M22,78 Q50,92 78,78 L72,85 Q50,98 28,85 Z" fill="#ef4444" />
+                    <circle cx="50" cy="88" r="4" fill="#fbbf24" />
+                </svg>
+            </div>
             <div class="shiba-name">迷你</div>
         </div>
     </div>
@@ -233,7 +287,6 @@
     </div>
 
     <!-- Modals -->
-    <!-- Task Modal -->
     <div id="taskModal" class="modal-overlay">
         <div class="modal">
             <h3 id="taskModalTitle">添加任务</h3>
@@ -246,7 +299,6 @@
         </div>
     </div>
 
-    <!-- Reward Modal -->
     <div id="rewardModal" class="modal-overlay">
         <div class="modal">
             <h3 id="rewardModalTitle">添加奖励</h3>
@@ -257,7 +309,6 @@
         </div>
     </div>
 
-    <!-- Achi Modal -->
     <div id="achiModal" class="modal-overlay">
         <div class="modal">
             <h3 id="achiModalTitle">挂上新目标</h3>
@@ -296,18 +347,11 @@
             history: {} 
         };
 
-        let state = JSON.parse(localStorage.getItem('lifeRpgState_v7'));
+        let state = JSON.parse(localStorage.getItem('lifeRpgState_v8'));
         if (!state) {
-            let oldState = JSON.parse(localStorage.getItem('lifeRpgState_v6'));
-            if (oldState) {
-                state = oldState;
-                // V6 升 V7 数据补偿
-                if(!state.achievements) state.achievements = defaultState.achievements;
-                // 移除旧版作为 task 的“亲亲快快”，因为顶部有了宠物互动区
-                state.tasks = state.tasks.filter(t => !t.text.includes("快快迷你"));
-            } else {
-                state = defaultState;
-            }
+            let oldState = JSON.parse(localStorage.getItem('lifeRpgState_v7'));
+            if (oldState) state = oldState;
+            else state = defaultState;
         }
         
         let currentDate = new Date(); 
@@ -318,9 +362,8 @@
         function getTodayStr() { return new Date().toLocaleDateString('en-CA'); }
         let todayStr = getTodayStr();
 
-        // 跨日逻辑 (包含连击惩罚逻辑)
+        // 跨日逻辑 
         if (state.lastLoginDate !== todayStr) {
-            // 简单疲劳惩罚：如果跨天了，先回满100
             state.hp = 100;
             state.tasks.forEach(t => { if(t.type === 'daily') t.done = false; });
             state.lastLoginDate = todayStr;
@@ -335,11 +378,8 @@
                     logs.push(`${t.text} (${sign}${t.goldReward}G)`);
                 }
             });
-            // 保留已存在的特殊记录 (存款, 盲盒, 成就, 撸狗)
             let existingLogs = (state.history[todayStr] && state.history[todayStr].logs) ? state.history[todayStr].logs : [];
             let specialLogs = existingLogs.filter(l => l.startsWith("主线:") || l.startsWith("盲盒:") || l.startsWith("🏅") || l.startsWith("🐕"));
-            
-            // 去重合并
             let finalLogs = [...new Set([...logs, ...specialLogs])];
 
             if (finalLogs.length > 0 || state.gold > 0) {
@@ -349,7 +389,7 @@
 
         function saveData() {
             updateTodayHistory(); 
-            localStorage.setItem('lifeRpgState_v7', JSON.stringify(state));
+            localStorage.setItem('lifeRpgState_v8', JSON.stringify(state));
             render();
             if(document.getElementById('history-tab').classList.contains('active')) {
                 renderCalendar();
@@ -357,20 +397,61 @@
             }
         }
 
-        // --- 柴犬互动 ---
+        // --- 🐕 气泡互动逻辑 ---
         let petCount = 0;
-        function petShiba(name) {
-            if (petCount >= 3) {
-                alert(`${name} 摇了摇尾巴，它今天已经很满足啦！`);
+        function showBubble(element, textHtml) {
+            let bubble = element.querySelector('.speech-bubble');
+            if (!bubble) {
+                bubble = document.createElement('div');
+                bubble.className = 'speech-bubble';
+                element.appendChild(bubble);
+            }
+            bubble.innerHTML = textHtml;
+            bubble.style.opacity = '1';
+            bubble.style.transform = 'translateY(0) translateX(-50%)';
+
+            if (element.timeoutId) clearTimeout(element.timeoutId);
+            element.timeoutId = setTimeout(() => {
+                bubble.style.opacity = '0';
+                bubble.style.transform = 'translateY(10px) translateX(-50%)';
+            }, 2500);
+        }
+
+        function petShiba(name, element) {
+            if (petCount >= 5) {
+                showBubble(element, `${name} 已经睡着啦...<br><span style="color:#999;font-size:0.8em">明天再来找它玩吧</span>`);
                 return;
             }
-            state.hp = Math.min(100, state.hp + 10);
             petCount++;
-            
+
+            // 多元化互动事件库
+            const actions = [
+                { text: "翻了个肚皮，疯狂摇尾巴！", hp: 15, gold: 0 },
+                { text: "用毛茸茸的脑袋蹭你的手心", hp: 10, gold: 0 },
+                { text: "不知道从哪叼来一枚金币！", hp: 5, gold: 10 },
+                { text: "把下巴搁在你的膝盖上...", hp: 20, gold: 0 },
+                { text: "打了个大大的哈欠呆看着你", hp: 5, gold: 0 },
+                { text: "汪汪！给你带来一整天元气！", hp: 15, gold: 0 },
+                { text: "咬坏了拖鞋...今天原谅它吧", hp: -5, gold: 0 }
+            ];
+
+            let action = actions[Math.floor(Math.random() * actions.length)];
+
+            state.hp = Math.max(0, Math.min(100, state.hp + action.hp));
+            state.gold += action.gold;
+
+            let effectHtml = action.hp >= 0 ? `<b style="color:var(--green)">+${action.hp} HP</b>` : `<b style="color:var(--red)">${action.hp} HP</b>`;
+            let effectText = action.hp >= 0 ? `+${action.hp} HP` : `${action.hp} HP`;
+            if (action.gold > 0) {
+                effectHtml += ` / <b style="color:var(--gold)">+${action.gold} G</b>`;
+                effectText += ` / +${action.gold} G`;
+            }
+
+            let logMsg = `🐕 ${name}: ${action.text} (${effectText})`;
             if(!state.history[todayStr]) state.history[todayStr] = { gold: state.gold, logs: [] };
-            state.history[todayStr].logs.push(`🐕 摸了摸${name} (+10 HP)`);
-            
-            alert(`你摸了摸${name}的头，感到非常治愈！❤️ HP +10`);
+            state.history[todayStr].logs.push(logMsg);
+
+            showBubble(element, `${action.text}<br>${effectHtml}`);
             saveData();
         }
 
@@ -380,22 +461,19 @@
             if (!confirm("确认花费 150G 抽取盲盒吗？考验血统的时刻到了！")) return;
 
             state.gold -= 150;
-            let r = Math.random(); // 0 to 1
+            let r = Math.random(); 
             let resultText = "";
             let logText = "";
 
             if (r < 0.15) {
-                // 15% 大爆款
                 state.gold += 500;
                 resultText = "🎉【隐藏款】欧皇附体！直接暴击 500 G 现金红包！";
                 logText = "盲盒: 欧皇附体赚了 500G！";
             } else if (r < 0.70) {
-                // 55% 小确幸
                 state.hp = Math.min(100, state.hp + 30);
                 resultText = "🎁【普通款】抽中了一杯外星人电解质水！恢复 30 HP！";
                 logText = "盲盒: 喝了电解质水 (+30 HP)";
             } else {
-                // 30% 非酋
                 state.hp = Math.max(0, state.hp - 10);
                 resultText = "🌩️【谢谢参与】非酋时刻...被吞了 150G，气得扣了 10 HP，今晚记得深蹲！";
                 logText = "盲盒: 啥都没抽到，气扣 10 HP";
@@ -530,13 +608,10 @@
             let a = state.achievements.find(x => x.id === id);
             if(a && !a.claimed) {
                 if(!confirm(`确认你已经达成【${a.name}】并领取 ${a.reward}G 吗？（做人要诚实哦！）`)) return;
-                
                 a.claimed = true;
                 state.gold += a.reward;
-                
                 if(!state.history[todayStr]) state.history[todayStr] = { gold: state.gold, logs: [] };
                 state.history[todayStr].logs.push(`🏅 点亮成就: ${a.name} (+${a.reward}G)`);
-                
                 alert(`恭喜达成成就【${a.name}】！奖励 ${a.reward}G 已入账！`);
                 saveData();
             }

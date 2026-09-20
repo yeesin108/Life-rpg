@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>人生手账</title>
+    <style>
+        :root { --bg: #f9f6f0; --text: #5c4d43; --accent: #e2b49a; --box: #ffffff; }
+        body { font-family: 'PingFang SC', sans-serif; background: var(--bg); color: var(--text); padding: 20px; max-width: 500px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2em; border-bottom: 2px dashed var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
+        .card { background: var(--box); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .task-item { display: flex; align-items: center; margin-bottom: 10px; font-size: 16px; }
+        .task-item input { margin-right: 12px; width: 18px; height: 18px; accent-color: var(--accent); }
+        .task-meta { font-size: 0.8em; color: #999; margin-left: auto; }
+        .shop-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        button { background: var(--accent); color: #fff; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button:disabled { background: #ccc; }
+        h3 { margin-top: 0; color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div id="hpDisplay">HP: 100/100</div>
+        <div id="goldDisplay">金币: 0 G</div>
+    </div>
+
+    <div class="card">
+        <h3>今日任务 (Dailies)</h3>
+        <div id="taskList"></div>
+    </div>
+
+    <div class="card">
+        <h3>奖励商店 (Rewards)</h3>
+        <div class="shop-item">
+            <span>免做便当卡 🍱</span>
+            <button onclick="buyReward(100, '免做便当')">100 G</button>
+        </div>
+        <div class="shop-item">
+            <span>连刷霸总短剧 📺</span>
+            <button onclick="buyReward(500, '看短剧')">500 G</button>
+        </div>
+        <div class="shop-item">
+            <span>豪华烤鸡排放纵餐 🍗</span>
+            <button onclick="buyReward(800, '吃鸡排')">800 G</button>
+        </div>
+        <div class="shop-item">
+            <span>买新首饰/安踏装备 🛍️</span>
+            <button onclick="buyReward(3000, '买装备')">3000 G</button>
+        </div>
+    </div>
+
+    <script>
+        // 核心数据模型
+        let state = JSON.parse(localStorage.getItem('lifeRpgState')) || {
+            hp: 100,
+            gold: 0,
+            lastLoginDate: new Date().toDateString(),
+            tasks: [
+                { id: 1, name: "记账", cost: 5, reward: 10, done: false },
+                { id: 2, name: "敷面膜", cost: 5, reward: 10, done: false },
+                { id: 3, name: "备菜/准备便当", cost: 15, reward: 20, done: false },
+                { id: 4, name: "运动打卡", cost: 25, reward: 50, done: false },
+                { id: 5, name: "亲亲快快迷你", cost: -30, reward: 0, done: false } // 负cost代表回血
+            ]
+        };
+
+        // 跨日刷新逻辑：如果今天不是上次登录的日期，重置HP和任务状态，保留金币
+        if (state.lastLoginDate !== new Date().toDateString()) {
+            state.hp = 100;
+            state.tasks.forEach(t => t.done = false);
+            state.lastLoginDate = new Date().toDateString();
+            saveData();
+        }
+
+        function saveData() {
+            localStorage.setItem('lifeRpgState', JSON.stringify(state));
+            render();
+        }
+
+        function toggleTask(id) {
+            let task = state.tasks.find(t => t.id === id);
+            if (!task.done) {
+                // 打勾
+                if(state.hp - task.cost < 0) { alert("HP不足！先去和快快迷你玩一会回血吧！"); return; }
+                state.hp = Math.min(100, state.hp - task.cost); // 上限100
+                state.gold += task.reward;
+                task.done = true;
+            } else {
+                // 取消打勾
+                state.hp = Math.min(100, state.hp + task.cost);
+                state.gold -= task.reward;
+                task.done = false;
+            }
+            saveData();
+        }
+
+        function buyReward(cost, name) {
+            if (state.gold >= cost) {
+                if(confirm(`确认花费 ${cost}G 兑换【${name}】吗？`)) {
+                    state.gold -= cost;
+                    alert("兑换成功！好好享受吧！");
+                    saveData();
+                }
+            } else {
+                alert("金币不足，继续完成日常任务吧！");
+            }
+        }
+
+        function render() {
+            document.getElementById('hpDisplay').innerText = `HP: ${state.hp}/100`;
+            document.getElementById('goldDisplay').innerText = `金币: ${state.gold} G`;
+            
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            state.tasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = 'task-item';
+                // 判断如果是回血任务，文字颜色特殊显示
+                const hpText = task.cost < 0 ? `+${Math.abs(task.cost)}HP` : `-${task.cost}HP`;
+                const goldText = task.reward > 0 ? ` / +${task.reward}G` : '';
+                
+                div.innerHTML = `
+                    <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                    <span style="text-decoration: ${task.done ? 'line-through' : 'none'}; color: ${task.done ? '#999' : '#5c4d43'}">${task.name}</span>
+                    <span class="task-meta">${hpText}${goldText}</span>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // 初始化渲染
+        render();
+    </script>
+</body>
+</html>
